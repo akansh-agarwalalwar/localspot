@@ -1,0 +1,207 @@
+.subadmin-dashboard {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.dashboard-header h1 {
+  color: #333;
+  margin: 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.role-badge {
+  background-color: #6f42c1;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.info-card,
+.permissions-card,
+.activities-card {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.info-card h3,
+.permissions-card h3,
+.activities-card h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.info-content p {
+  margin: 10px 0;
+  color: #555;
+}
+
+.info-content strong {
+  color: #333;
+  display: inline-block;
+  min-width: 100px;
+}
+
+.permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.permission-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.permission-item.granted {
+  background-color: #f8f9fa;
+  border-color: #28a745;
+}
+
+.permission-item.denied {
+  background-color: #fff5f5;
+  border-color: #dc3545;
+}
+
+.status.allowed {
+  color: #28a745;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.status.denied {
+  color: #dc3545;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.activities-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  background-color: #fafafa;
+}
+
+.activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.action-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.action-badge.create { background-color: #d4edda; color: #155724; }
+.action-badge.read { background-color: #d1ecf1; color: #0c5460; }
+.action-badge.update { background-color: #fff3cd; color: #856404; }
+.action-badge.delete { background-color: #f8d7da; color: #721c24; }
+.action-badge.login { background-color: #e2e3e5; color: #383d41; }
+.action-badge.logout { background-color: #e2e3e5; color: #383d41; }
+
+.activity-time {
+  font-size: 12px;
+  color: #666;
+}
+
+.activity-details p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.activity-details strong {
+  color: #333;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .subadmin-dashboard {
+    padding: 10px;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .permissions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .activity-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .info-content strong {
+    min-width: 80px;
+    font-size: 14px;
+  }
+  
+  .permission-item {
+    padding: 8px;
+  }
+  
+  .activity-item {
+    padding: 12px;
+  }
+}
