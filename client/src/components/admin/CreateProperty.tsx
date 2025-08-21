@@ -40,7 +40,18 @@ const CreateProperty: React.FC<CreatePropertyProps> = ({ onSubmit, loading = fal
 
     const validPics = formData.pics.filter(pic => pic.trim() !== '');
     if (validPics.length === 0) {
-      errors.pics = 'At least one image link is required';
+      errors.pics = 'At least one image URL is required';
+    } else {
+      // Enhanced URL validation on frontend
+      const invalidUrls = validPics.filter(pic => {
+        const url = pic.trim();
+        // Accept any HTTPS URL
+        return !/^https?:\/\/.+\..+/.test(url);
+      });
+      
+      if (invalidUrls.length > 0) {
+        errors.pics = 'Please provide valid URLs (must start with http:// or https://)';
+      }
     }
 
     setValidationErrors(errors);
@@ -264,16 +275,16 @@ const CreateProperty: React.FC<CreatePropertyProps> = ({ onSubmit, loading = fal
 
             <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
               <p className="text-sm text-blue-800">
-                📌 <strong>How to get Google Drive image links:</strong>
+                📌 <strong>Supported image sources:</strong>
               </p>
-              <ol className="text-sm text-blue-700 mt-2 ml-4 list-decimal">
-                <li>Upload image to Google Drive</li>
-                <li>Right-click → Share → Anyone with the link</li>
-                <li>Copy the link and paste it below</li>
-                <li>The system will automatically convert it for display</li>
-              </ol>
+              <ul className="text-sm text-blue-700 mt-2 ml-4 list-disc">
+                <li><strong>Google Drive:</strong> Share link and we'll convert it automatically</li>
+                <li><strong>Direct images:</strong> URLs ending in .jpg, .png, .gif, etc.</li>
+                <li><strong>Image hosts:</strong> Imgur, Cloudinary, AWS S3, etc.</li>
+                <li><strong>Any HTTPS URL:</strong> That serves images</li>
+              </ul>
               <div className="mt-3 p-2 bg-blue-100 rounded text-xs text-blue-600">
-                <strong>Example:</strong> https://drive.google.com/file/d/1jpsSuHz1iS0HXjZMC_h7YG_ZUGhq9dew/view?usp=sharing
+                <strong>Example:</strong> https://drive.google.com/file/d/1jpsSuHz1iS0HXjZMC_h7YG_ZUGhq9dew/view
               </div>
             </div>
 

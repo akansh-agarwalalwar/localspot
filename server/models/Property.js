@@ -29,13 +29,35 @@ const propertySchema = new mongoose.Schema({
         required: true,
         validate: {
             validator: function(url) {
-                // Enhanced validation for Google Drive links and other image URLs
-                return /^https?:\/\/.+/.test(url) && 
-                       (url.includes('drive.google.com') || 
-                        url.includes('googleapis.com') ||
-                        /\.(jpg|jpeg|png|gif|webp)$/i.test(url));
+                // Enhanced URL validation to accept more image URL formats
+                if (!url || typeof url !== 'string') return false;
+                
+                // Check if it's a valid HTTP/HTTPS URL
+                if (!/^https?:\/\/.+/.test(url)) return false;
+                
+                // Accept various image URL patterns:
+                // 1. Google Drive links
+                // 2. Direct image URLs with extensions
+                // 3. CDN and image hosting services
+                // 4. Any HTTPS URL that could potentially serve images
+                
+                const validPatterns = [
+                    /drive\.google\.com/,                    // Google Drive
+                    /googleapis\.com/,                      // Google APIs
+                    /googleusercontent\.com/,               // Google User Content
+                    /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i, // Direct image extensions
+                    /imgur\.com/,                           // Imgur
+                    /cloudinary\.com/,                      // Cloudinary
+                    /amazonaws\.com/,                       // AWS S3
+                    /unsplash\.com/,                        // Unsplash
+                    /pexels\.com/,                          // Pexels
+                    /pixabay\.com/,                         // Pixabay
+                    /^https:\/\/.+\..+/                     // Any valid HTTPS URL with domain
+                ];
+                
+                return validPatterns.some(pattern => pattern.test(url));
             },
-            message: 'Invalid image URL format. Please provide Google Drive links or direct image URLs.'
+            message: 'Invalid image URL format. Please provide a valid image URL (Google Drive, direct image link, or image hosting service).'
         }
     }],
     createdBy: {
@@ -50,11 +72,6 @@ const propertySchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-
-// Index for better search performance
-propertySchema.index({ title: 'text', location: 'text', description: 'text' });
-propertySchema.index({ createdBy: 1 });
-propertySchema.index({ isActive: 1 });
 
 // Helper method to convert Google Drive sharing link to direct image URL
 propertySchema.methods.getDirectImageUrls = function() {
@@ -79,5 +96,10 @@ propertySchema.virtual('directImageUrls').get(function() {
 // Ensure virtual fields are serialized
 propertySchema.set('toJSON', { virtuals: true });
 propertySchema.set('toObject', { virtuals: true });
+
+// Index for better search performance
+propertySchema.index({ title: 'text', location: 'text', description: 'text' });
+propertySchema.index({ createdBy: 1 });
+propertySchema.index({ isActive: 1 });
 
 module.exports = mongoose.model('Property', propertySchema);

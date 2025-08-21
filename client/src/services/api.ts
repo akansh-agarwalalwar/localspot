@@ -73,7 +73,10 @@ export const subadminAPI = {
 
 // Property API
 export const propertyAPI = {
-  createProperty: (data: PropertyFormData) => api.post('/properties', data),
+  createProperty: (data: PropertyFormData) => {
+    console.log('Sending property data:', data);
+    return api.post('/properties', data);
+  },
   getAllProperties: (params = {}) => api.get('/properties', { params }),
   getPropertyById: (id: string) => api.get(`/properties/${id}`),
   updateProperty: (id: string, data: Partial<PropertyFormData>) => api.put(`/properties/${id}`, data),

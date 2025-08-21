@@ -5,6 +5,8 @@ const createProperty = async (req, res) => {
     try {
         const { title, description, price, location, pics } = req.body;
 
+        console.log('Received property data:', { title, description, price, location, pics });
+
         if (!title || !description || !price || !location || !pics || pics.length === 0) {
             return res.status(400).json({ 
                 message: 'All fields are required (title, description, price, location, pics)' 
@@ -15,28 +17,36 @@ const createProperty = async (req, res) => {
             return res.status(400).json({ message: 'Price must be greater than 0' });
         }
 
-        // Filter out empty pic URLs and convert Google Drive URLs
+        // Filter out empty pic URLs and normalize Google Drive URLs
         const validPics = pics.filter(pic => pic && pic.trim() !== '').map(pic => {
-            // Convert Google Drive sharing URL to direct view URL
-            if (pic.includes('drive.google.com/file/d/')) {
-                const fileIdMatch = pic.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            const trimmedPic = pic.trim();
+            
+            // Convert Google Drive sharing URL to direct view URL if needed
+            if (trimmedPic.includes('drive.google.com/file/d/')) {
+                const fileIdMatch = trimmedPic.match(/\/d\/([a-zA-Z0-9-_]+)/);
                 if (fileIdMatch) {
-                    return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+                    const convertedUrl = `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+                    console.log(`Converting Google Drive URL: ${trimmedPic} -> ${convertedUrl}`);
+                    return convertedUrl;
                 }
             }
-            return pic;
+            
+            console.log(`Using original URL: ${trimmedPic}`);
+            return trimmedPic;
         });
 
         if (validPics.length === 0) {
             return res.status(400).json({ message: 'At least one valid image URL is required' });
         }
 
+        console.log('Processed image URLs:', validPics);
+
         const property = new Property({
             title,
             description,
             price: Number(price),
             location,
-            pics: validPics, // Store converted URLs
+            pics: validPics,
             createdBy: req.user._id
         });
 
@@ -55,7 +65,7 @@ const createProperty = async (req, res) => {
                 price: property.price,
                 location: property.location,
                 pics: property.pics,
-                directImageUrls: property.directImageUrls, // Include converted URLs
+                directImageUrls: property.directImageUrls,
                 createdBy: property.createdBy,
                 isActive: property.isActive,
                 createdAt: property.createdAt,
@@ -64,6 +74,17 @@ const createProperty = async (req, res) => {
         });
     } catch (error) {
         console.error('Create property error:', error);
+        
+        // Handle validation errors specifically
+        if (error.name === 'ValidationError') {
+            const validationErrors = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ 
+                message: 'Validation failed', 
+                errors: validationErrors,
+                details: error.errors
+            });
+        }
+        
         res.status(500).json({ message: 'Internal server error' });
     }
 };
