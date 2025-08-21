@@ -79,3 +79,24 @@ export interface ActivityFilters {
   startDate?: string;
   endDate?: string;
 }
+
+export interface Property {
+  _id: string;
+  title: string;
+  description: string;
+  price: number;
+  location: string;
+  pics: string[]; // Array of Google Drive links
+  createdBy: string | User;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PropertyFormData {
+  title: string;
+  description: string;
+  price: number;
+  location: string;
+  pics: string[];
+}

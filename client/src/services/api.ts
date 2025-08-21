@@ -2,7 +2,8 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { 
   LoginCredentials, 
   SubadminFormData, 
-  ActivityFilters
+  ActivityFilters,
+  PropertyFormData
 } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -68,6 +69,15 @@ export const activityAPI = {
 // Subadmin API
 export const subadminAPI = {
   getDashboard: () => api.get('/subadmin/dashboard'),
+};
+
+// Property API
+export const propertyAPI = {
+  createProperty: (data: PropertyFormData) => api.post('/properties', data),
+  getAllProperties: (params = {}) => api.get('/properties', { params }),
+  getPropertyById: (id: string) => api.get(`/properties/${id}`),
+  updateProperty: (id: string, data: Partial<PropertyFormData>) => api.put(`/properties/${id}`, data),
+  deleteProperty: (id: string) => api.delete(`/properties/${id}`),
 };
 
 export default api;

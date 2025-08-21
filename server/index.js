@@ -6,7 +6,8 @@ const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const subadminRoutes = require('./routes/subadmin');
 const activityRoutes = require('./routes/activity');
-const setupRoutes = require('./routes/setup'); 
+const setupRoutes = require('./routes/setup');
+const propertyRoutes = require('./routes/property');
 
 dotenv.config();
 
@@ -31,7 +32,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/subadmin', subadminRoutes);
 app.use('/api/activity', activityRoutes);
-app.use('/api/setup', setupRoutes); // <-- added
+app.use('/api/setup', setupRoutes);
+app.use('/api/properties', propertyRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -50,25 +50,9 @@ const Login: React.FC = () => {
     }
   };
 
-  const fillDemoCredentials = (type: 'admin' | 'subadmin') => {
-    if (type === 'admin') {
-      setFormData({
-        email: 'admin@localspot.com',
-        password: 'admin123'
-      });
-    } else {
-      setFormData({
-        email: 'subadmin@localspot.com',
-        password: 'subadmin123'
-      });
-    }
-    setError('');
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-
         {/* Login Form */}
         <div className="bg-white rounded-xl shadow-2xl p-8">
           <div className="text-center mb-8">
@@ -79,7 +63,6 @@ const Login: React.FC = () => {
                 : 'Sign in to your admin or subadmin account'}
             </p>
           </div>
-
           {isAuthenticated && user && (
             <div className="mb-6 space-y-3">
               <div className="p-3 rounded border border-blue-200 bg-blue-50 text-sm text-blue-700">
@@ -125,7 +108,6 @@ const Login: React.FC = () => {
                 placeholder="Enter your email"
               />
             </div>
-            
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -152,7 +134,6 @@ const Login: React.FC = () => {
                 </button>
               </div>
             </div>
-            
             <button 
               type="submit" 
               disabled={loading} 
@@ -168,31 +149,7 @@ const Login: React.FC = () => {
               )}
             </button>
           </form>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm font-medium text-gray-700 mb-3">Demo Credentials:</p>
-            <div className="space-y-2">
-              <button
-                type="button"
-                onClick={() => fillDemoCredentials('admin')}
-                disabled={loading}
-                className="w-full text-left p-2 text-xs bg-blue-50 hover:bg-blue-100 rounded border border-blue-200 transition-colors disabled:opacity-50"
-              >
-                <strong>Admin:</strong> admin@localspot.com / admin123
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemoCredentials('subadmin')}
-                disabled={loading}
-                className="w-full text-left p-2 text-xs bg-green-50 hover:bg-green-100 rounded border border-green-200 transition-colors disabled:opacity-50"
-              >
-                <strong>Subadmin:</strong> subadmin@localspot.com / subadmin123
-              </button>
-            </div>
-          </div>
         </div>
-
       </div>
     </div>
   );
