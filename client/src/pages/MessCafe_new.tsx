@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Filter, MapPin, Star, Wifi, Car, Users, Utensils, Clock, IndianRupee, Eye, Heart, Share2, Calendar } from "lucide-react";
+import { Star, MapPin, Clock, IndianRupee, Utensils, Filter, Eye, Heart, Share2, Calendar, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,165 +14,155 @@ import { Textarea } from "@/components/ui/textarea";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
-import { propertyAPI } from "@/services/api";
-import { Property } from "@/types";
+import { messAPI } from "@/services/api";
+import { Mess } from "@/types";
 import PropertyImageFast from "@/components/common/PropertyImageFast";
-import PropertyAmenities from "@/components/common/PropertyAmenities";
-import { amenityConfig, getAvailableRoomTypes } from "@/utils/propertyUtils";
 import { createBookingMessage, createWhatsAppURL } from "@/utils/whatsappConfig";
 import { toast } from "sonner";
 
-const PGHostels = () => {
+const MessCafe = () => {
   const navigate = useNavigate();
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 25000]); // Changed from [5000, 20000] to include all properties
-  const [distanceRange, setDistanceRange] = useState([0, 5000]); // Distance in meters (0 to 5km)
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [priceRange, setPriceRange] = useState([0, 200]); // Daily pricing range
+  const [messes, setMesses] = useState<Mess[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("rating");
+  const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [totalProperties, setTotalProperties] = useState(0);
+  const [totalMesses, setTotalMesses] = useState(0);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [selectedMess, setSelectedMess] = useState<Mess | null>(null);
+  const [mealFilter, setMealFilter] = useState<string[]>([]);
   const [bookingForm, setBookingForm] = useState({
     name: '',
     mobile: '',
     email: '',
-    roomType: '',
-    moveInDate: '',
+    mealType: '',
+    startDate: '',
     message: ''
   });
-  const itemsPerPage = 4; // Show 4 properties per page
+  const itemsPerPage = 4;
 
-  // Fetch properties from backend
+  // Fetch messes from backend
   useEffect(() => {
-    // Ensure page starts from top when component mounts
     window.scrollTo(0, 0);
     
-    const fetchProperties = async () => {
+    const fetchMesses = async () => {
       try {
         setLoading(true);
         setCurrentPage(1);
-        const response = await propertyAPI.getAllProperties({ 
+        const response = await messAPI.getAllMesses({ 
           page: 1, 
           limit: itemsPerPage 
         });
         const data = response.data;
-        const properties = data.properties || [];
-        setProperties(properties);
-        setTotalProperties(data.pagination?.total || 0);
+        const messes = data.messes || [];
+        setMesses(messes);
+        setTotalMesses(data.pagination?.total || 0);
         setHasMore(data.pagination ? data.pagination.page < data.pagination.pages : false);
         
         // Preload first few images for faster display
-        properties.slice(0, 2).forEach((property) => {
-          // Prioritize cover photo, fallback to first pic
-          const imageUrl = property.coverPhoto || (property.pics && property.pics.length > 0 ? property.pics[0] : null);
-          if (imageUrl) {
+        messes.slice(0, 2).forEach((mess) => {
+          if (mess.coverPhoto) {
             const img = new Image();
-            img.src = imageUrl.includes('drive.google.com') 
-              ? `https://drive.google.com/uc?export=view&id=${imageUrl.match(/\/d\/(.+?)\//)?.[1] || ''}`
-              : imageUrl;
+            img.src = mess.coverPhoto.includes('drive.google.com') 
+              ? `https://drive.google.com/uc?export=view&id=${mess.coverPhoto.match(/\/d\/(.+?)\//)?.[1] || ''}`
+              : mess.coverPhoto;
           }
         });
       } catch (error: any) {
-        toast.error('Failed to fetch properties');
-        console.error('Error fetching properties:', error);
+        toast.error('Failed to fetch messes');
+        console.error('Error fetching messes:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProperties();
+    fetchMesses();
   }, []);
 
   // Reset and refetch when search term changes
   useEffect(() => {
     const resetAndFetch = async () => {
       if (searchTerm !== "") {
-        // If there's a search term, fetch all properties and filter client-side
         try {
           setLoading(true);
-          const response = await propertyAPI.getAllProperties({ 
+          const response = await messAPI.getAllMesses({ 
             page: 1, 
-            limit: 100 // Get more properties for better search results
+            limit: 100 
           });
           const data = response.data;
-          setProperties(data.properties || []);
-          setTotalProperties(data.pagination?.total || 0);
+          setMesses(data.messes || []);
+          setTotalMesses(data.pagination?.total || 0);
           setCurrentPage(1);
-          setHasMore(false); // Disable pagination during search
+          setHasMore(false);
         } catch (error: any) {
-          toast.error('Failed to fetch properties');
-          console.error('Error fetching properties:', error);
+          toast.error('Failed to fetch messes');
+          console.error('Error fetching messes:', error);
         } finally {
           setLoading(false);
         }
       } else {
-        // Reset to initial state when search is cleared
         try {
           setLoading(true);
           setCurrentPage(1);
-          const response = await propertyAPI.getAllProperties({ 
+          const response = await messAPI.getAllMesses({ 
             page: 1, 
             limit: itemsPerPage 
           });
           const data = response.data;
-          setProperties(data.properties || []);
-          setTotalProperties(data.pagination?.total || 0);
+          setMesses(data.messes || []);
+          setTotalMesses(data.pagination?.total || 0);
           setHasMore(data.pagination ? data.pagination.page < data.pagination.pages : false);
         } catch (error: any) {
-          toast.error('Failed to fetch properties');
-          console.error('Error fetching properties:', error);
+          toast.error('Failed to fetch messes');
+          console.error('Error fetching messes:', error);
         } finally {
           setLoading(false);
         }
       }
     };
 
-    // Debounce search to avoid too many API calls
     const timeoutId = setTimeout(resetAndFetch, 300);
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
-  // Load more properties
-  const loadMoreProperties = async () => {
+  // Load more messes
+  const loadMoreMesses = async () => {
     if (loadingMore || !hasMore) return;
 
     try {
       setLoadingMore(true);
       const nextPage = currentPage + 1;
-      const response = await propertyAPI.getAllProperties({ 
+      const response = await messAPI.getAllMesses({ 
         page: nextPage, 
         limit: itemsPerPage 
       });
       const data = response.data;
       
-      // Append new properties to existing ones
-      setProperties(prev => [...prev, ...(data.properties || [])]);
+      setMesses(prev => [...prev, ...(data.messes || [])]);
       setCurrentPage(nextPage);
       setHasMore(data.pagination ? data.pagination.page < data.pagination.pages : false);
     } catch (error: any) {
-      toast.error('Failed to load more properties');
-      console.error('Error loading more properties:', error);
+      toast.error('Failed to load more messes');
+      console.error('Error loading more messes:', error);
     } finally {
       setLoadingMore(false);
     }
   };
 
   // Handle booking button click
-  const handleBookNow = (property: Property) => {
-    setSelectedProperty(property);
+  const handleBookNow = (mess: Mess) => {
+    setSelectedMess(mess);
     setIsBookingOpen(true);
-    // Reset form when opening
     setBookingForm({
       name: '',
       mobile: '',
       email: '',
-      roomType: '',
-      moveInDate: '',
+      mealType: '',
+      startDate: '',
       message: ''
     });
   };
@@ -187,84 +177,86 @@ const PGHostels = () => {
 
   // Handle WhatsApp submission
   const handleSubmitBooking = () => {
-    // Validate required fields
     if (!bookingForm.name || !bookingForm.mobile || !bookingForm.email) {
       toast.error('Please fill in all required fields');
       return;
     }
 
-    if (!selectedProperty) {
-      toast.error('No property selected');
+    if (!selectedMess) {
+      toast.error('No mess selected');
       return;
     }
 
-    // Create message using utility function
-    const message = createBookingMessage(selectedProperty, bookingForm);
+    // Create custom message for mess booking
+    const message = `Hello! I'd like to book meals at ${selectedMess.title}.
+
+*Customer Details:*
+Name: ${bookingForm.name}
+Mobile: ${bookingForm.mobile}
+Email: ${bookingForm.email}
+
+*Booking Details:*
+Mess: ${selectedMess.title}
+Location: ${selectedMess.location}
+${bookingForm.mealType ? `Meal Type: ${bookingForm.mealType}` : ''}
+${bookingForm.startDate ? `Start Date: ${bookingForm.startDate}` : ''}
+
+${bookingForm.message ? `Additional Message: ${bookingForm.message}` : ''}
+
+Please provide more details about pricing and availability.`;
     
-    // Create WhatsApp URL
     const whatsappURL = createWhatsAppURL(message);
-    
-    // Open WhatsApp
     window.open(whatsappURL, '_blank');
     
-    // Close dialog and show success message
     setIsBookingOpen(false);
     toast.success('Redirecting to WhatsApp...');
   };
 
-  // Filter and sort properties
-  const filteredProperties = properties.filter(property => {
-    const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         property.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPrice = property.price >= priceRange[0] && property.price <= priceRange[1];
+  // Calculate average meal price for sorting
+  const getAverageMealPrice = (mess: Mess) => {
+    const prices = [];
+    if (mess.timings.breakfast.available) prices.push(mess.pricing.breakfast);
+    if (mess.timings.lunch.available) prices.push(mess.pricing.lunch);
+    if (mess.timings.dinner.available) prices.push(mess.pricing.dinner);
+    if (mess.timings.snacks.available) prices.push(mess.pricing.snacks);
     
-    // Distance filtering - simple keyword matching for now
-    const matchesDistance = (() => {
-      const location = property.location.toLowerCase();
-      const maxDistance = distanceRange[1];
-      
-      // If max distance is 5000m (5km), include all properties
-      if (maxDistance >= 5000) return true;
-      
-      // Simple distance matching based on location keywords
-      if (maxDistance >= 0 && maxDistance < 500) {
-        // Very close (0-500m): look for "near", "opposite", "next to" DTU/college
-        return location.includes('near') || location.includes('opposite') || location.includes('next');
-      } else if (maxDistance >= 500 && maxDistance < 1000) {
-        // Close (500m-1km): include areas known to be close to DTU
-        return location.includes('dtu') || location.includes('rohini') || location.includes('sector');
-      } else if (maxDistance >= 1000 && maxDistance < 2000) {
-        // Medium (1-2km): broader DTU area
-        return location.includes('dtu') || location.includes('delhi') || location.includes('north');
-      } else {
-        // Far (2-5km): include all areas
-        return true;
+    return prices.length > 0 ? prices.reduce((sum, price) => sum + price, 0) / prices.length : 0;
+  };
+
+  // Filter and sort messes
+  const filteredMesses = messes.filter(mess => {
+    const matchesSearch = mess.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         mess.location.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const avgPrice = getAverageMealPrice(mess);
+    const matchesPrice = avgPrice >= priceRange[0] && avgPrice <= priceRange[1];
+    
+    const matchesMeals = mealFilter.length === 0 || mealFilter.some(meal => {
+      switch(meal) {
+        case 'breakfast': return mess.timings.breakfast.available;
+        case 'lunch': return mess.timings.lunch.available;
+        case 'dinner': return mess.timings.dinner.available;
+        case 'snacks': return mess.timings.snacks.available;
+        default: return false;
       }
-    })();
+    });
     
-    return matchesSearch && matchesPrice && matchesDistance && property.isActive;
+    return matchesSearch && matchesPrice && matchesMeals && mess.isActive;
   });
 
-  // Sort properties based on selected criteria
-  const sortedProperties = [...filteredProperties].sort((a, b) => {
+  // Sort messes
+  const sortedMesses = [...filteredMesses].sort((a, b) => {
     switch (sortBy) {
       case 'price-low':
-        return a.price - b.price;
+        return getAverageMealPrice(a) - getAverageMealPrice(b);
       case 'price-high':
-        return b.price - a.price;
+        return getAverageMealPrice(b) - getAverageMealPrice(a);
       case 'newest':
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       default:
         return 0;
     }
   });
-
-  const badgeColors = {
-    "Best Seller": "bg-primary text-primary-foreground",
-    "Top Rated": "bg-success text-success-foreground",
-    "Popular": "bg-secondary text-secondary-foreground",
-    "Budget Friendly": "bg-accent text-accent-foreground",
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -280,10 +272,10 @@ const PGHostels = () => {
             className="text-center"
           >
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-shadow-lg">
-              PGs & Hostels in Delhi
+              Messes & Cafes in Delhi
             </h1>
             <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              Find comfortable and affordable accommodations with all modern amenities
+              Delicious homemade meals and fresh food options near your location
             </p>
             
             {/* Search Bar */}
@@ -297,12 +289,13 @@ const PGHostels = () => {
                 />
                 <Select>
                   <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="Room Type" />
+                    <SelectValue placeholder="Meal Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="single">Single Seater</SelectItem>
-                    <SelectItem value="double">Double Seater</SelectItem>
-                    <SelectItem value="triple">Triple Seater</SelectItem>
+                    <SelectItem value="breakfast">Breakfast</SelectItem>
+                    <SelectItem value="lunch">Lunch</SelectItem>
+                    <SelectItem value="dinner">Dinner</SelectItem>
+                    <SelectItem value="snacks">Snacks</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button className="bg-gradient-primary hover:opacity-90">
@@ -332,88 +325,51 @@ const PGHostels = () => {
 
                 {/* Price Range */}
                 <div className="space-y-4 mb-6">
-                  <h4 className="font-medium">Price Range</h4>
+                  <h4 className="font-medium">Average Meal Price</h4>
                   <Slider
                     value={priceRange}
                     onValueChange={setPriceRange}
-                    max={25000}
+                    max={200}
                     min={0}
-                    step={500}
+                    step={10}
                     className="w-full"
                   />
                   <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>₹{priceRange[0].toLocaleString()}</span>
-                    <span>₹{priceRange[1].toLocaleString()}</span>
+                    <span>₹{priceRange[0]}</span>
+                    <span>₹{priceRange[1]}</span>
                   </div>
                 </div>
 
-                {/* Room Type */}
+                {/* Meal Type */}
                 <div className="space-y-3 mb-6">
-                  <h4 className="font-medium">Room Type</h4>
-                  {["Single Seater", "Double Seater", "Triple Seater"].map((type) => (
-                    <div key={type} className="flex items-center space-x-2">
-                      <Checkbox id={type} />
-                      <label htmlFor={type} className="text-sm">{type}</label>
+                  <h4 className="font-medium">Available Meals</h4>
+                  {["breakfast", "lunch", "dinner", "snacks"].map((meal) => (
+                    <div key={meal} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={meal}
+                        checked={mealFilter.includes(meal)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setMealFilter(prev => [...prev, meal]);
+                          } else {
+                            setMealFilter(prev => prev.filter(m => m !== meal));
+                          }
+                        }}
+                      />
+                      <label htmlFor={meal} className="text-sm capitalize">{meal}</label>
                     </div>
                   ))}
                 </div>
 
                 {/* AC Type */}
                 <div className="space-y-3 mb-6">
-                  <h4 className="font-medium">AC Type</h4>
+                  <h4 className="font-medium">Air Conditioning</h4>
                   {["AC", "Non-AC"].map((type) => (
                     <div key={type} className="flex items-center space-x-2">
                       <Checkbox id={type} />
                       <label htmlFor={type} className="text-sm">{type}</label>
                     </div>
                   ))}
-                </div>
-
-                {/* Distance Filter */}
-                <div className="space-y-4 mb-6">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
-                    Distance from DTU
-                  </h4>
-                  <Slider
-                    value={distanceRange}
-                    onValueChange={setDistanceRange}
-                    max={5000}
-                    min={0}
-                    step={100}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>{distanceRange[0]}m</span>
-                    <span>
-                      {distanceRange[1] >= 5000 
-                        ? "5km+" 
-                        : distanceRange[1] >= 1000 
-                          ? `${(distanceRange[1] / 1000).toFixed(1)}km`
-                          : `${distanceRange[1]}m`
-                      }
-                    </span>
-                  </div>
-                  <div className="text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
-                    <div className="space-y-1">
-                      <div className="flex justify-between">
-                        <span>0-500m:</span>
-                        <span className="text-green-600">Walking distance</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>500m-1km:</span>
-                        <span className="text-blue-600">Very close</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>1-2km:</span>
-                        <span className="text-orange-600">Close</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>2-5km:</span>
-                        <span className="text-gray-600">Nearby</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -425,9 +381,9 @@ const PGHostels = () => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold">
-                  {loading ? "Loading..." : `Showing ${sortedProperties.length} of ${totalProperties} PGs & Hostels`}
+                  {loading ? "Loading..." : `Showing ${sortedMesses.length} of ${totalMesses} Messes & Cafes`}
                 </h2>
-                <p className="text-muted-foreground">Best accommodations in Delhi</p>
+                <p className="text-muted-foreground">Best food options in Delhi</p>
               </div>
               <div className="flex items-center gap-4">
                 <Button
@@ -476,24 +432,25 @@ const PGHostels = () => {
                     </div>
                   ))}
                 </div>
-              ) : sortedProperties.length === 0 ? (
-                // No properties found
+              ) : sortedMesses.length === 0 ? (
+                // No messes found
                 <div className="text-center py-12">
                   <div className="max-w-md mx-auto">
                     <div className="h-32 w-32 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                      <MapPin className="h-12 w-12 text-gray-400" />
+                      <Utensils className="h-12 w-12 text-gray-400" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No properties found</h3>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No messes found</h3>
                     <p className="text-gray-500 mb-4">
-                      {searchTerm || priceRange[0] !== 0 || priceRange[1] !== 25000
+                      {searchTerm || priceRange[0] !== 0 || priceRange[1] !== 200
                         ? 'Try adjusting your search criteria or filters.'
-                        : 'No properties are currently available.'}
+                        : 'No messes are currently available.'}
                     </p>
                     <Button 
                       variant="outline" 
                       onClick={() => {
                         setSearchTerm('');
-                        setPriceRange([0, 25000]);
+                        setPriceRange([0, 200]);
+                        setMealFilter([]);
                       }}
                     >
                       Clear Filters
@@ -501,10 +458,10 @@ const PGHostels = () => {
                   </div>
                 </div>
               ) : (
-                // Properties list
-                sortedProperties.map((property, index) => (
+                // Messes list
+                sortedMesses.map((mess, index) => (
                   <motion.div
-                    key={property._id}
+                    key={mess._id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -515,17 +472,16 @@ const PGHostels = () => {
                       {/* Image */}
                       <div className="relative">
                         <div className="aspect-[4/3] bg-muted rounded-xl overflow-hidden">
-                          {/* Prioritize cover photo, fallback to first pic */}
-                          {(property.coverPhoto || (property.pics && property.pics.length > 0)) ? (
+                          {mess.coverPhoto || (mess.images && mess.images.length > 0) ? (
                             <PropertyImageFast 
-                              src={property.coverPhoto || property.pics[0]} 
-                              alt={property.title}
+                              src={mess.coverPhoto || mess.images[0]} 
+                              alt={mess.title}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
                               <div className="text-center">
-                                <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                                <Utensils className="h-12 w-12 text-gray-400 mx-auto mb-2" />
                                 <span className="text-sm text-gray-500">No Image</span>
                               </div>
                             </div>
@@ -534,20 +490,15 @@ const PGHostels = () => {
                         
                         {/* Badge */}
                         <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground font-semibold">
-                          Featured
+                          {mess.hasAC ? 'AC Available' : 'Pure Veg'}
                         </Badge>
                         
-                        {/* Image Count - Count total photos */}
-                        {(() => {
-                          const totalPhotos = (property.coverPhoto ? 1 : 0) + 
-                                            (property.facilityPhotos?.length || 0) + 
-                                            (property.pics?.length || 0);
-                          return totalPhotos > 1 && (
-                            <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
-                              {totalPhotos} photos
-                            </div>
-                          );
-                        })()}
+                        {/* Image Count */}
+                        {mess.images && mess.images.length > 1 && (
+                          <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
+                            {mess.images.length} photos
+                          </div>
+                        )}
                       </div>
 
                       {/* Content */}
@@ -557,7 +508,7 @@ const PGHostels = () => {
                           <div>
                             <div className="flex items-center gap-2 mb-2">
                               <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
-                                {property.title}
+                                {mess.title}
                               </h3>
                               <Badge variant="outline" className="text-xs text-success border-success">
                                 Verified
@@ -565,7 +516,11 @@ const PGHostels = () => {
                             </div>
                             <div className="flex items-center gap-1 text-muted-foreground">
                               <MapPin className="h-4 w-4" />
-                              <span>{property.location}</span>
+                              <span>{mess.location}</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-muted-foreground text-sm mt-1">
+                              <MapPin className="h-3 w-3" />
+                              <span>{mess.distanceFromDTU} from DTU</span>
                             </div>
                           </div>
                           
@@ -581,43 +536,70 @@ const PGHostels = () => {
 
                         {/* Description */}
                         <p className="text-sm text-muted-foreground line-clamp-2">
-                          {property.description}
+                          {mess.description}
                         </p>
 
-                        {/* Amenities - Fetch from backend property data */}
+                        {/* Meal Timings & Pricing */}
                         <div className="space-y-2">
-                          <PropertyAmenities 
-                            property={property} 
-                            compact={true} 
-                            showRoomTypes={true}
-                            className="text-sm"
-                          />
+                          <div className="grid grid-cols-2 gap-4 text-xs">
+                            {mess.timings.breakfast.available && (
+                              <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
+                                <Clock className="h-3 w-3 text-primary" />
+                                <span>Breakfast: {mess.timings.breakfast.time}</span>
+                                <span className="ml-auto font-semibold">₹{mess.pricing.breakfast}</span>
+                              </div>
+                            )}
+                            {mess.timings.lunch.available && (
+                              <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
+                                <Clock className="h-3 w-3 text-primary" />
+                                <span>Lunch: {mess.timings.lunch.time}</span>
+                                <span className="ml-auto font-semibold">₹{mess.pricing.lunch}</span>
+                              </div>
+                            )}
+                            {mess.timings.dinner.available && (
+                              <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
+                                <Clock className="h-3 w-3 text-primary" />
+                                <span>Dinner: {mess.timings.dinner.time}</span>
+                                <span className="ml-auto font-semibold">₹{mess.pricing.dinner}</span>
+                              </div>
+                            )}
+                            {mess.timings.snacks.available && (
+                              <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-2">
+                                <Clock className="h-3 w-3 text-primary" />
+                                <span>Snacks: {mess.timings.snacks.time}</span>
+                                <span className="ml-auto font-semibold">₹{mess.pricing.snacks}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
 
-                        {/* Price & Actions */}
+                        {/* Average Price & Actions */}
                         <div className="flex items-center justify-between pt-4 border-t">
                           <div>
                             <div className="flex items-center gap-2">
                               <span className="text-2xl font-bold text-primary">
-                                ₹{property.price.toLocaleString()}
+                                ₹{Math.round(getAverageMealPrice(mess))}
                               </span>
+                              <span className="text-sm text-muted-foreground">avg per meal</span>
                             </div>
-                            <span className="text-sm text-muted-foreground">per month</span>
+                            {mess.hasAC && (
+                              <Badge variant="secondary" className="text-xs mt-1">AC Available</Badge>
+                            )}
                           </div>
                           
                           <div className="flex gap-3">
                             <Button 
                               variant="outline"
-                              onClick={() => navigate(`/pg-details/${property._id}`)}
+                              onClick={() => navigate(`/mess-details/${mess._id}`)}
                             >
                               <Eye className="h-4 w-4 mr-2" />
                               View Details
                             </Button>
                             <Button 
                               className="hover-glow"
-                              onClick={() => handleBookNow(property)}
+                              onClick={() => handleBookNow(mess)}
                             >
-                              Book Now
+                              Book Meals
                             </Button>
                           </div>
                         </div>
@@ -629,7 +611,7 @@ const PGHostels = () => {
             </motion.div>
 
             {/* Load More */}
-            {!loading && sortedProperties.length > 0 && hasMore && (
+            {!loading && sortedMesses.length > 0 && hasMore && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -640,36 +622,36 @@ const PGHostels = () => {
                   size="lg" 
                   variant="outline" 
                   className="hover:bg-gradient-primary hover:text-white"
-                  onClick={loadMoreProperties}
+                  onClick={loadMoreMesses}
                   disabled={loadingMore}
                 >
                   {loadingMore ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                      <Loader className="animate-spin h-4 w-4 mr-2" />
                       Loading...
                     </>
                   ) : (
-                    `Load More Listings (${totalProperties - sortedProperties.length} remaining)`
+                    `Load More Messes (${totalMesses - sortedMesses.length} remaining)`
                   )}
                 </Button>
               </motion.div>
             )}
 
-            {/* Show message when all properties are loaded */}
-            {!loading && sortedProperties.length > 0 && !hasMore && (
+            {/* Show message when all messes are loaded */}
+            {!loading && sortedMesses.length > 0 && !hasMore && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
                 className="text-center mt-12"
               >
-                  <Button 
-                    variant="link" 
-                    className="ml-2 p-0 h-auto"
-                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  >
-                    Back to top
-                  </Button>
+                <Button 
+                  variant="link" 
+                  className="ml-2 p-0 h-auto"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                >
+                  Back to top
+                </Button>
               </motion.div>
             )}
           </div>
@@ -680,14 +662,16 @@ const PGHostels = () => {
       <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Book Your Stay</DialogTitle>
+            <DialogTitle>Book Your Meals</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            {selectedProperty && (
+            {selectedMess && (
               <div className="bg-muted/50 rounded-lg p-3 mb-4">
-                <h4 className="font-semibold text-sm">{selectedProperty.title}</h4>
-                <p className="text-sm text-muted-foreground">{selectedProperty.location}</p>
-                <p className="text-sm font-medium text-primary">₹{selectedProperty.price.toLocaleString()}/month</p>
+                <h4 className="font-semibold text-sm">{selectedMess.title}</h4>
+                <p className="text-sm text-muted-foreground">{selectedMess.location}</p>
+                <p className="text-sm font-medium text-primary">
+                  Avg ₹{Math.round(getAverageMealPrice(selectedMess))}/meal
+                </p>
               </div>
             )}
             <div className="space-y-2">
@@ -719,46 +703,53 @@ const PGHostels = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="room-type">Room Type</Label>
-              <Select value={bookingForm.roomType} onValueChange={(value) => handleFormChange('roomType', value)}>
+              <Label htmlFor="meal-type">Meal Preference</Label>
+              <Select value={bookingForm.mealType} onValueChange={(value) => handleFormChange('mealType', value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select room type" />
+                  <SelectValue placeholder="Select meal type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(() => {
-                    if (selectedProperty) {
-                      const availableRoomTypes = getAvailableRoomTypes(selectedProperty);
-                      if (availableRoomTypes.length > 0) {
-                        return availableRoomTypes.map((roomType) => (
-                          <SelectItem key={roomType.key} value={roomType.key}>
-                            {roomType.label} Room - ₹{selectedProperty.price.toLocaleString()}
-                          </SelectItem>
-                        ));
-                      }
-                    }
-                    return (
-                      <SelectItem value="standard">
-                        Standard Room - ₹{selectedProperty?.price?.toLocaleString() || 'N/A'}
-                      </SelectItem>
-                    );
-                  })()}
+                  {selectedMess && (
+                    <>
+                      {selectedMess.timings.breakfast.available && (
+                        <SelectItem value="breakfast">
+                          Breakfast ({selectedMess.timings.breakfast.time}) - ₹{selectedMess.pricing.breakfast}
+                        </SelectItem>
+                      )}
+                      {selectedMess.timings.lunch.available && (
+                        <SelectItem value="lunch">
+                          Lunch ({selectedMess.timings.lunch.time}) - ₹{selectedMess.pricing.lunch}
+                        </SelectItem>
+                      )}
+                      {selectedMess.timings.dinner.available && (
+                        <SelectItem value="dinner">
+                          Dinner ({selectedMess.timings.dinner.time}) - ₹{selectedMess.pricing.dinner}
+                        </SelectItem>
+                      )}
+                      {selectedMess.timings.snacks.available && (
+                        <SelectItem value="snacks">
+                          Snacks ({selectedMess.timings.snacks.time}) - ₹{selectedMess.pricing.snacks}
+                        </SelectItem>
+                      )}
+                    </>
+                  )}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="date">Preferred Move-in Date</Label>
+              <Label htmlFor="date">Preferred Start Date</Label>
               <Input 
                 id="date" 
                 type="date" 
-                value={bookingForm.moveInDate}
-                onChange={(e) => handleFormChange('moveInDate', e.target.value)}
+                value={bookingForm.startDate}
+                onChange={(e) => handleFormChange('startDate', e.target.value)}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="message">Additional Message</Label>
               <Textarea 
                 id="message" 
-                placeholder="Any special requirements..." 
+                placeholder="Any dietary requirements or special requests..." 
                 value={bookingForm.message}
                 onChange={(e) => handleFormChange('message', e.target.value)}
               />
@@ -778,4 +769,4 @@ const PGHostels = () => {
   );
 };
 
-export default PGHostels;
+export default MessCafe;

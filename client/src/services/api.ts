@@ -3,7 +3,8 @@ import {
   LoginCredentials, 
   SubadminFormData, 
   ActivityFilters,
-  PropertyFormData
+  PropertyFormData,
+  MessFormData
 } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004/api';
@@ -84,6 +85,21 @@ export const propertyAPI = {
   // Admin endpoints (require auth)
   getAllPropertiesAdmin: (params = {}) => api.get('/properties', { params }),
   getPropertyByIdAdmin: (id: string) => api.get(`/properties/${id}`),
+};
+
+// Mess API
+export const messAPI = {
+  createMess: (data: MessFormData) => {
+    console.log('Sending mess data:', data);
+    return api.post('/messes', data);
+  },
+  getAllMesses: (params = {}) => api.get('/messes/public', { params }), // Use public endpoint
+  getMessById: (id: string) => api.get(`/messes/public/${id}`), // Use public endpoint
+  updateMess: (id: string, data: Partial<MessFormData>) => api.put(`/messes/${id}`, data),
+  deleteMess: (id: string) => api.delete(`/messes/${id}`),
+  // Admin endpoints (require auth)
+  getAllMessesAdmin: (params = {}) => api.get('/messes', { params }),
+  getMessByIdAdmin: (id: string) => api.get(`/messes/${id}`),
 };
 
 export default api;

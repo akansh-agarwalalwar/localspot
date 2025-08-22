@@ -13,6 +13,7 @@ import Index from "./pages/Index";
 import PGHostels from "./pages/PGHostels";
 import PGDetails from "./pages/PGDetails";
 import MessCafe from "./pages/MessCafe";
+import MessDetails from "./pages/MessDetails";
 import GamingZone from "./pages/GamingZone";
 import AboutUs from "./pages/AboutUs";
 import Contact from "./pages/Contact";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/pg-hostels" element={<PGHostels />} />
             <Route path="/pg-details/:id" element={<PGDetails />} />
             <Route path="/mess-cafe" element={<MessCafe />} />
+            <Route path="/mess-details/:id" element={<MessDetails />} />
             <Route path="/gaming-zone" element={<GamingZone />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />

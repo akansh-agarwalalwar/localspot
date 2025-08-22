@@ -140,3 +140,78 @@ export interface PropertyFormData {
   coverPhoto: string; // Single cover photo URL (required)
   facilityPhotos: string[]; // Array of facility/interior photos
 }
+
+export interface Mess {
+  _id: string;
+  title: string;
+  description: string;
+  location: string;
+  distanceFromDTU: string;
+  images: string[];
+  coverPhoto: string;
+  timings: {
+    breakfast: {
+      available: boolean;
+      time: string;
+    };
+    lunch: {
+      available: boolean;
+      time: string;
+    };
+    dinner: {
+      available: boolean;
+      time: string;
+    };
+    snacks: {
+      available: boolean;
+      time: string;
+    };
+  };
+  hasAC: boolean;
+  pricing: {
+    breakfast: number;
+    lunch: number;
+    dinner: number;
+    snacks: number;
+  };
+  createdBy: string | User;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  directImageUrls?: string[];
+  directCoverPhotoUrl?: string;
+}
+
+export interface MessFormData {
+  title: string;
+  description: string;
+  location: string;
+  distanceFromDTU: string;
+  images: string[];
+  coverPhoto: string;
+  timings: {
+    breakfast: {
+      available: boolean;
+      time: string;
+    };
+    lunch: {
+      available: boolean;
+      time: string;
+    };
+    dinner: {
+      available: boolean;
+      time: string;
+    };
+    snacks: {
+      available: boolean;
+      time: string;
+    };
+  };
+  hasAC: boolean;
+  pricing: {
+    breakfast: number;
+    lunch: number;
+    dinner: number;
+    snacks: number;
+  };
+}

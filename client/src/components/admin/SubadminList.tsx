@@ -30,7 +30,12 @@ const SubadminList: React.FC<SubadminListProps> = ({
       username: subadmin.username,
       email: subadmin.email,
       isActive: subadmin.isActive,
-      permissions: subadmin.permissions,
+      permissions: {
+        canCreate: subadmin.permissions?.canCreate ?? false,
+        canRead: subadmin.permissions?.canRead ?? true,
+        canUpdate: subadmin.permissions?.canUpdate ?? false,
+        canDelete: subadmin.permissions?.canDelete ?? false,
+      },
     });
   };
 
@@ -230,15 +235,20 @@ const SubadminList: React.FC<SubadminListProps> = ({
                       <td className="px-6 py-4">
                         {editingId === subadmin.id ? (
                           <div className="space-y-2">
-                            {Object.entries(editData.permissions || {}).map(([permission, value]) => (
-                              <label key={permission} className="flex items-center space-x-2 text-sm">
+                            {[
+                              { key: 'canCreate', label: 'Can Create' },
+                              { key: 'canRead', label: 'Can Read' },
+                              { key: 'canUpdate', label: 'Can Update' },
+                              { key: 'canDelete', label: 'Can Delete' },
+                            ].map(({ key, label }) => (
+                              <label key={key} className="flex items-center space-x-2 text-sm">
                                 <input
                                   type="checkbox"
-                                  checked={value}
-                                  onChange={(e) => handlePermissionChange(permission, e.target.checked)}
+                                  checked={editData.permissions?.[key] || false}
+                                  onChange={(e) => handlePermissionChange(key, e.target.checked)}
                                   className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                                 />
-                                <span className="text-gray-700">{permission.replace('can', 'Can ')}</span>
+                                <span className="text-gray-700">{label}</span>
                               </label>
                             ))}
                           </div>

@@ -12,6 +12,7 @@ interface PropertyListProps {
   onUpdate: (id: string, data: Partial<PropertyFormData>) => Promise<boolean>;
   onDelete: (id: string) => Promise<void>;
   onPageChange: (page: number) => Promise<void>;
+  onEdit?: (property: Property) => void;
 }
 
 const PropertyList: React.FC<PropertyListProps> = ({ 
@@ -21,7 +22,8 @@ const PropertyList: React.FC<PropertyListProps> = ({
   currentUser,
   onUpdate, 
   onDelete, 
-  onPageChange 
+  onPageChange,
+  onEdit 
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
@@ -30,19 +32,20 @@ const PropertyList: React.FC<PropertyListProps> = ({
   const canModifyProperty = (property: Property, action: 'update' | 'delete') => {
     if (!currentUser) return false;
     
-    // Admin can modify any property
-    if (currentUser.role === 'admin') return true;
+    // Admin can modify any property (if they have the permission)
+    if (currentUser.role === 'admin') {
+      return action === 'update' 
+        ? currentUser.permissions.canUpdate 
+        : currentUser.permissions.canDelete;
+    }
     
-    // Check if user owns the property
-    const isOwner = property.createdBy === currentUser.id;
-    
-    // Check if user has global permission
+    // For subadmins - they can modify if they have the permission
+    // The ownership check will be enforced on the backend
     const hasPermission = action === 'update' 
       ? currentUser.permissions.canUpdate 
       : currentUser.permissions.canDelete;
     
-    // Subadmin can modify if they own it OR have global permission
-    return isOwner || hasPermission;
+    return hasPermission;
   };
 
   const filteredProperties = properties.filter(property => {
@@ -144,9 +147,10 @@ const PropertyList: React.FC<PropertyListProps> = ({
                 <div key={property._id} className="bg-white border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                   {/* Property Image */}
                   <div className="h-48 bg-gray-200 relative overflow-hidden rounded-t-lg">
-                    {property.pics && property.pics.length > 0 ? (
+                    {/* Prioritize cover photo, fallback to first pic */}
+                    {(property.coverPhoto || (property.pics && property.pics.length > 0)) ? (
                       <PropertyImage 
-                        src={property.pics[0]} 
+                        src={property.coverPhoto || property.pics[0]} 
                         alt={property.title}
                         className="w-full h-full object-cover"
                       />
@@ -197,15 +201,19 @@ const PropertyList: React.FC<PropertyListProps> = ({
                       <div className="flex space-x-2">
                         <button
                           onClick={() => {
-                            const fileId = extractGoogleDriveFileId(property.pics[0]);
-                            if (fileId) {
-                              // Use the corrected direct URL format
-                              window.open(`https://drive.google.com/uc?export=view&id=${fileId}`, '_blank');
-                            } else {
-                              window.open(property.pics[0], '_blank');
+                            // Prioritize cover photo, fallback to first pic
+                            const imageUrl = property.coverPhoto || (property.pics && property.pics.length > 0 ? property.pics[0] : null);
+                            if (imageUrl) {
+                              const fileId = extractGoogleDriveFileId(imageUrl);
+                              if (fileId) {
+                                // Use the corrected direct URL format
+                                window.open(`https://drive.google.com/uc?export=view&id=${fileId}`, '_blank');
+                              } else {
+                                window.open(imageUrl, '_blank');
+                              }
                             }
                           }}
-                          disabled={!property.pics || property.pics.length === 0}
+                          disabled={!property.coverPhoto && (!property.pics || property.pics.length === 0)}
                           className="text-xs px-3 py-1 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 disabled:opacity-50 transition-colors font-medium"
                           title="View full image with direct URL"
                         >
@@ -213,20 +221,33 @@ const PropertyList: React.FC<PropertyListProps> = ({
                         </button>
                         <button
                           onClick={() => {
-                            const fileId = extractGoogleDriveFileId(property.pics[0]);
-                            if (fileId) {
-                              // Also provide option to view in Drive interface
-                              window.open(`https://drive.google.com/file/d/${fileId}/view`, '_blank');
-                            } else {
-                              window.open(property.pics[0], '_blank');
+                            // Prioritize cover photo, fallback to first pic
+                            const imageUrl = property.coverPhoto || (property.pics && property.pics.length > 0 ? property.pics[0] : null);
+                            if (imageUrl) {
+                              const fileId = extractGoogleDriveFileId(imageUrl);
+                              if (fileId) {
+                                // Also provide option to view in Drive interface
+                                window.open(`https://drive.google.com/file/d/${fileId}/view`, '_blank');
+                              } else {
+                                window.open(imageUrl, '_blank');
+                              }
                             }
                           }}
-                          disabled={!property.pics || property.pics.length === 0}
+                          disabled={!property.coverPhoto && (!property.pics || property.pics.length === 0)}
                           className="text-xs px-2 py-1 rounded-md bg-green-50 text-green-600 hover:bg-green-100 disabled:opacity-50 transition-colors"
                           title="Open in Google Drive"
                         >
                           📁
                         </button>
+                        {canModifyProperty(property, 'update') && (
+                          <button
+                            onClick={() => onEdit?.(property)}
+                            className="text-xs px-3 py-1 rounded-md bg-yellow-50 text-yellow-600 hover:bg-yellow-100 transition-colors font-medium"
+                            title={`Edit ${property.title}`}
+                          >
+                            ✏️ Edit
+                          </button>
+                        )}
                         {canModifyProperty(property, 'delete') && (
                           <button
                             onClick={() => onDelete(property._id)}

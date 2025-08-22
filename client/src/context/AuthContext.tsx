@@ -12,6 +12,7 @@ interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<LoginResponse>;
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
+  refreshUserProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -168,6 +169,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const refreshUserProfile = async (): Promise<void> => {
+    try {
+      const response = await authAPI.getProfile();
+      const user = response.data.user;
+      
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+        dispatch({ type: 'UPDATE_USER', payload: user });
+        console.log('User profile refreshed successfully');
+      }
+    } catch (error) {
+      console.error('Failed to refresh user profile:', error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -175,6 +191,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         login,
         logout,
         updateUser,
+        refreshUserProfile,
       }}
     >
       {children}

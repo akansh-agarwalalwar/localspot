@@ -22,7 +22,7 @@ const GamingZone = () => {
     {
       id: 1,
       name: "GameZone Pro",
-      location: "Indiranagar, Bangalore",
+      location: "Indiranagar, Delhi",
       rating: 4.9,
       reviews: 234,
       hourlyRate: 100,
@@ -40,7 +40,7 @@ const GamingZone = () => {
     {
       id: 2,
       name: "Elite Gaming Arena",
-      location: "Koramangala, Bangalore",
+      location: "Koramangala, Delhi",
       rating: 4.7,
       reviews: 189,
       hourlyRate: 120,
@@ -58,7 +58,7 @@ const GamingZone = () => {
     {
       id: 3,
       name: "Retro Gaming Hub",
-      location: "HSR Layout, Bangalore",
+      location: "HSR Layout, Delhi",
       rating: 4.5,
       reviews: 156,
       hourlyRate: 80,
@@ -76,7 +76,7 @@ const GamingZone = () => {
     {
       id: 4,
       name: "Cyber Sports Zone",
-      location: "Electronic City, Bangalore",
+      location: "Electronic City, Delhi",
       rating: 4.6,
       reviews: 198,
       hourlyRate: 90,
@@ -199,7 +199,7 @@ const GamingZone = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold">Found {gamingZones.length} Gaming Zones</h2>
-            <p className="text-muted-foreground">Premium gaming experiences in Bangalore</p>
+            <p className="text-muted-foreground">Premium gaming experiences in Delhi</p>
           </div>
           <Select>
             <SelectTrigger className="w-48">

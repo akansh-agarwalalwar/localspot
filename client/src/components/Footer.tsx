@@ -127,7 +127,7 @@ const Footer = () => {
     {
       icon: MapPin,
       label: "Address",
-      value: "123 Tech Park, Bangalore, Karnataka 560001",
+      value: "123 Tech Park, Delhi, Delhi 110001",
       href: "#",
     },
   ];

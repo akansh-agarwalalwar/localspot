@@ -7,14 +7,16 @@ import { toast } from 'sonner';
 import { Pagination, Property, PropertyFormData } from '../../types';
 import PropertyList from '../admin/PropertyList';
 import CreateProperty from '../admin/CreateProperty';
+import EditProperty from '../admin/EditProperty';
 import { propertyAPI } from '../../services/api';
 
 const SubadminDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, refreshUserProfile } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'properties' | 'add-property'>('overview');
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [creating, setCreating] = useState<boolean>(false);
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [propertyPagination, setPropertyPagination] = useState<Pagination>({
     page: 1,
     limit: 12,
@@ -27,7 +29,12 @@ const SubadminDashboard: React.FC = () => {
     
     try {
       setLoading(true);
-      const response = await propertyAPI.getAllPropertiesAdmin({ page, limit: propertyPagination.limit });
+      // For subadmins, only fetch properties they created
+      const params = user?.role === 'subadmin' 
+        ? { page, limit: propertyPagination.limit, createdBy: user.id }
+        : { page, limit: propertyPagination.limit };
+        
+      const response = await propertyAPI.getAllPropertiesAdmin(params);
       setProperties(response.data.properties || []);
       setPropertyPagination(response.data.pagination || { page: 1, limit: 12, total: 0, pages: 0 });
     } catch (error) {
@@ -43,7 +50,7 @@ const SubadminDashboard: React.FC = () => {
     }
   }, [activeTab]);
 
-  const handleCreateProperty = async (data: PropertyFormData): Promise<boolean> => {
+    const handleCreateProperty = async (data: PropertyFormData): Promise<boolean> => {
     if (!user?.permissions.canCreate) {
       toast.error('You do not have permission to create properties');
       return false;
@@ -54,7 +61,6 @@ const SubadminDashboard: React.FC = () => {
       await propertyAPI.createProperty(data);
       toast.success('Property created successfully');
       fetchProperties();
-      setActiveTab('properties');
       return true;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to create property';
@@ -65,14 +71,45 @@ const SubadminDashboard: React.FC = () => {
     }
   };
 
+  const handleEditProperty = (property: Property): void => {
+    // Check if subadmin owns the property - handle both string ID and User object
+    const propertyCreatorId = typeof property.createdBy === 'string' 
+      ? property.createdBy 
+      : property.createdBy?.id;
+      
+    if (user?.role === 'subadmin' && propertyCreatorId !== user.id) {
+      toast.error('You can only edit properties that you created');
+      return;
+    }
+
+    if (!user?.permissions.canUpdate) {
+      toast.error('You need update permission to edit properties');
+      return;
+    }
+
+    setEditingProperty(property);
+  };
+
+  const handleCloseEdit = (): void => {
+    setEditingProperty(null);
+  };
+
   const handleUpdateProperty = async (id: string, data: Partial<PropertyFormData>): Promise<boolean> => {
-    // Subadmins can update properties they created OR if they have global update permission
+    // Subadmins can ONLY update properties they created (ownership-based access)
     const property = properties.find(p => p._id === id);
-    const isOwner = property?.createdBy === user?.id;
-    const hasUpdatePermission = user?.permissions.canUpdate;
+    const propertyCreatorId = typeof property?.createdBy === 'string' 
+      ? property.createdBy 
+      : property?.createdBy?.id;
+      
+    const isOwner = propertyCreatorId === user?.id;
     
-    if (!hasUpdatePermission && !isOwner) {
-      toast.error('You can only update properties you created');
+    if (!isOwner) {
+      toast.error('You can only update properties that you created');
+      return false;
+    }
+
+    if (!user?.permissions.canUpdate) {
+      toast.error('You need update permission to modify properties');
       return false;
     }
 
@@ -80,6 +117,7 @@ const SubadminDashboard: React.FC = () => {
       await propertyAPI.updateProperty(id, data);
       toast.success('Property updated successfully');
       fetchProperties();
+      setEditingProperty(null); // Close the edit modal
       return true;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Failed to update property';
@@ -89,13 +127,21 @@ const SubadminDashboard: React.FC = () => {
   };
 
   const handleDeleteProperty = async (id: string): Promise<void> => {
-    // Subadmins can delete properties they created OR if they have global delete permission
+    // Subadmins can ONLY delete properties they created (ownership-based access)
     const property = properties.find(p => p._id === id);
-    const isOwner = property?.createdBy === user?.id;
-    const hasDeletePermission = user?.permissions.canDelete;
+    const propertyCreatorId = typeof property?.createdBy === 'string' 
+      ? property.createdBy 
+      : property?.createdBy?.id;
+      
+    const isOwner = propertyCreatorId === user?.id;
     
-    if (!hasDeletePermission && !isOwner) {
-      toast.error('You can only delete properties you created');
+    if (!isOwner) {
+      toast.error('You can only delete properties that you created');
+      return;
+    }
+
+    if (!user?.permissions.canDelete) {
+      toast.error('You need delete permission to remove properties');
       return;
     }
 
@@ -143,7 +189,15 @@ const SubadminDashboard: React.FC = () => {
             </div>
 
             <section className="bg-white rounded-xl border p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Your Permissions</h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">Your Permissions</h3>
+                <button
+                  onClick={refreshUserProfile}
+                  className="text-sm px-3 py-1 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
+                >
+                  Refresh
+                </button>
+              </div>
               <PermissionsBadge permissions={user?.permissions || {
                 canCreate: false,
                 canRead: false,
@@ -224,11 +278,21 @@ const SubadminDashboard: React.FC = () => {
           onUpdate={handleUpdateProperty}
           onDelete={handleDeleteProperty}
           onPageChange={fetchProperties}
+          onEdit={handleEditProperty}
         />
       )}
 
       {activeTab === 'add-property' && user?.permissions.canCreate && (
         <CreateProperty onSubmit={handleCreateProperty} loading={creating} />
+      )}
+
+      {/* Edit Property Modal */}
+      {editingProperty && (
+        <EditProperty
+          property={editingProperty}
+          onUpdate={handleUpdateProperty}
+          onClose={handleCloseEdit}
+        />
       )}
     </DashboardLayout>
   );
