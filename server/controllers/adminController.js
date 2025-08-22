@@ -129,7 +129,10 @@ const updateSubadmin = async (req, res) => {
 
         if (username) subadmin.username = username;
         if (email) subadmin.email = email;
-        if (permissions) subadmin.permissions = { ...subadmin.permissions, ...permissions };
+        if (permissions) {
+            // Replace permissions entirely instead of merging to allow setting permissions to false
+            subadmin.permissions = permissions;
+        }
         if (typeof isActive === 'boolean') subadmin.isActive = isActive;
 
         await subadmin.save();

@@ -62,29 +62,32 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Set default permissions based on role
+// Set default permissions based on role (only when creating new user)
 userSchema.pre('save', function(next) {
-    if (this.role === 'admin') {
-        this.permissions = {
-            canCreate: true,
-            canRead: true,
-            canUpdate: true,
-            canDelete: true
-        };
-    } else if (this.role === 'subadmin') {
-        this.permissions = {
-            canCreate: false,
-            canRead: true,
-            canUpdate: false,
-            canDelete: false
-        };
-    } else if (this.role === 'user') {
-        this.permissions = {
-            canCreate: false,
-            canRead: true,
-            canUpdate: false,
-            canDelete: false
-        };
+    // Only set default permissions if this is a new user (not being updated)
+    if (this.isNew) {
+        if (this.role === 'admin') {
+            this.permissions = {
+                canCreate: true,
+                canRead: true,
+                canUpdate: true,
+                canDelete: true
+            };
+        } else if (this.role === 'subadmin') {
+            this.permissions = {
+                canCreate: false,
+                canRead: true,
+                canUpdate: false,
+                canDelete: false
+            };
+        } else if (this.role === 'user') {
+            this.permissions = {
+                canCreate: false,
+                canRead: true,
+                canUpdate: false,
+                canDelete: false
+            };
+        }
     }
     next();
 });

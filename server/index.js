@@ -8,6 +8,7 @@ const subadminRoutes = require('./routes/subadmin');
 const activityRoutes = require('./routes/activity');
 const setupRoutes = require('./routes/setup');
 const propertyRoutes = require('./routes/property');
+const messRoutes = require('./routes/mess');
 const subscriptionRoutes = require('./routes/subscription');
 const bookingRoutes = require('./routes/booking');
 
@@ -36,6 +37,7 @@ app.use('/api/subadmin', subadminRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/setup', setupRoutes);
 app.use('/api/properties', propertyRoutes);
+app.use('/api/messes', messRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/booking', bookingRoutes);
 

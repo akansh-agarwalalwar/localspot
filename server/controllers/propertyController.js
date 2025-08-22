@@ -218,12 +218,24 @@ const getAllProperties = async (req, res) => {
         }
 
         res.json({
-            properties: properties.map(property => ({
-                ...property.toObject(),
-                directImageUrls: property.directImageUrls, // Include converted URLs
-                directCoverPhotoUrl: property.directCoverPhotoUrl, // Include converted cover photo
-                directFacilityPhotoUrls: property.directFacilityPhotoUrls // Include converted facility photos
-            })),
+            properties: properties.map(property => {
+                const propertyObj = property.toObject();
+                
+                // Transform createdBy to have id field for frontend compatibility
+                if (propertyObj.createdBy && propertyObj.createdBy._id) {
+                    propertyObj.createdBy = {
+                        ...propertyObj.createdBy,
+                        id: propertyObj.createdBy._id.toString()
+                    };
+                }
+                
+                return {
+                    ...propertyObj,
+                    directImageUrls: property.directImageUrls,
+                    directCoverPhotoUrl: property.directCoverPhotoUrl,
+                    directFacilityPhotoUrls: property.directFacilityPhotoUrls
+                };
+            }),
             pagination: {
                 page,
                 limit,
@@ -254,12 +266,24 @@ const getPropertyById = async (req, res) => {
         }
 
         res.json({ 
-            property: {
-                ...property.toObject(),
-                directImageUrls: property.directImageUrls,
-                directCoverPhotoUrl: property.directCoverPhotoUrl,
-                directFacilityPhotoUrls: property.directFacilityPhotoUrls
-            }
+            property: (() => {
+                const propertyObj = property.toObject();
+                
+                // Transform createdBy to have id field for frontend compatibility
+                if (propertyObj.createdBy && propertyObj.createdBy._id) {
+                    propertyObj.createdBy = {
+                        ...propertyObj.createdBy,
+                        id: propertyObj.createdBy._id.toString()
+                    };
+                }
+                
+                return {
+                    ...propertyObj,
+                    directImageUrls: property.directImageUrls,
+                    directCoverPhotoUrl: property.directCoverPhotoUrl,
+                    directFacilityPhotoUrls: property.directFacilityPhotoUrls
+                };
+            })()
         });
     } catch (error) {
         console.error('Get property error:', error);
@@ -277,18 +301,61 @@ const updateProperty = async (req, res) => {
             return res.status(404).json({ message: 'Property not found' });
         }
 
+        // Debug logging for ownership check
+        console.log('=== UPDATE PROPERTY DEBUG ===');
+        console.log('Property ID:', id);
+        console.log('Property createdBy:', property.createdBy);
+        console.log('Property createdBy type:', typeof property.createdBy);
+        console.log('User ID:', req.user._id);
+        console.log('User ID type:', typeof req.user._id);
+        console.log('User role:', req.user.role);
+
         // Permission logic:
-        // 1. Admin can update any property
-        // 2. Subadmin can update if they have canUpdate permission OR if they own the property
+        // 1. Admin can update any property (if they have canUpdate permission)
+        // 2. Subadmin can ONLY update properties they created (ownership-based access)
         const isAdmin = req.user.role === 'admin';
-        const isOwner = property.createdBy.toString() === req.user._id.toString();
-        const hasUpdatePermission = req.user.permissions.canUpdate;
         
-        if (!isAdmin && !isOwner && !hasUpdatePermission) {
-            return res.status(403).json({ 
-                message: 'You can only update properties you created or need update permission' 
-            });
+        // Handle both string and populated object cases for createdBy
+        let creatorId;
+        if (typeof property.createdBy === 'string') {
+            creatorId = property.createdBy;
+        } else if (property.createdBy && property.createdBy._id) {
+            creatorId = property.createdBy._id.toString();
+        } else {
+            creatorId = null;
         }
+        
+        const isOwner = creatorId === req.user._id.toString();
+        
+        console.log('Creator ID extracted:', creatorId);
+        console.log('isAdmin:', isAdmin);
+        console.log('isOwner:', isOwner);
+        
+        if (isAdmin) {
+            // Admin needs canUpdate permission to update any property
+            if (!req.user.permissions.canUpdate) {
+                return res.status(403).json({ 
+                    message: 'You need update permission to modify properties' 
+                });
+            }
+        } else {
+            // Subadmin can only update their own properties
+            if (!isOwner) {
+                console.log('❌ Ownership check failed');
+                return res.status(403).json({ 
+                    message: 'You can only update properties that you created' 
+                });
+            }
+            // Also check if subadmin has update permission
+            if (!req.user.permissions.canUpdate) {
+                return res.status(403).json({ 
+                    message: 'You need update permission to modify properties' 
+                });
+            }
+        }
+
+        console.log('✅ All checks passed, proceeding with update');
+        console.log('=== END DEBUG ===');
 
         if (title) property.title = title;
         if (description) property.description = description;
@@ -362,18 +429,61 @@ const deleteProperty = async (req, res) => {
             return res.status(404).json({ message: 'Property not found' });
         }
 
+        // Debug logging for ownership check
+        console.log('=== DELETE PROPERTY DEBUG ===');
+        console.log('Property ID:', id);
+        console.log('Property createdBy:', property.createdBy);
+        console.log('Property createdBy type:', typeof property.createdBy);
+        console.log('User ID:', req.user._id);
+        console.log('User ID type:', typeof req.user._id);
+        console.log('User role:', req.user.role);
+
         // Permission logic:
-        // 1. Admin can delete any property
-        // 2. Subadmin can delete if they have canDelete permission OR if they own the property
+        // 1. Admin can delete any property (if they have canDelete permission)
+        // 2. Subadmin can ONLY delete properties they created (ownership-based access)
         const isAdmin = req.user.role === 'admin';
-        const isOwner = property.createdBy.toString() === req.user._id.toString();
-        const hasDeletePermission = req.user.permissions.canDelete;
         
-        if (!isAdmin && !isOwner && !hasDeletePermission) {
-            return res.status(403).json({ 
-                message: 'You can only delete properties you created or need delete permission' 
-            });
+        // Handle both string and populated object cases for createdBy
+        let creatorId;
+        if (typeof property.createdBy === 'string') {
+            creatorId = property.createdBy;
+        } else if (property.createdBy && property.createdBy._id) {
+            creatorId = property.createdBy._id.toString();
+        } else {
+            creatorId = null;
         }
+        
+        const isOwner = creatorId === req.user._id.toString();
+        
+        console.log('Creator ID extracted:', creatorId);
+        console.log('isAdmin:', isAdmin);
+        console.log('isOwner:', isOwner);
+        
+        if (isAdmin) {
+            // Admin needs canDelete permission to delete any property
+            if (!req.user.permissions.canDelete) {
+                return res.status(403).json({ 
+                    message: 'You need delete permission to remove properties' 
+                });
+            }
+        } else {
+            // Subadmin can only delete their own properties
+            if (!isOwner) {
+                console.log('❌ Ownership check failed');
+                return res.status(403).json({ 
+                    message: 'You can only delete properties that you created' 
+                });
+            }
+            // Also check if subadmin has delete permission
+            if (!req.user.permissions.canDelete) {
+                return res.status(403).json({ 
+                    message: 'You need delete permission to remove properties' 
+                });
+            }
+        }
+
+        console.log('✅ All checks passed, proceeding with delete');
+        console.log('=== END DEBUG ===');
 
         await Property.findByIdAndDelete(id);
 
