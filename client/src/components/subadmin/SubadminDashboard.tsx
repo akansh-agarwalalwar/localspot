@@ -27,7 +27,7 @@ const SubadminDashboard: React.FC = () => {
     
     try {
       setLoading(true);
-      const response = await propertyAPI.getAllProperties({ page, limit: propertyPagination.limit });
+      const response = await propertyAPI.getAllPropertiesAdmin({ page, limit: propertyPagination.limit });
       setProperties(response.data.properties || []);
       setPropertyPagination(response.data.pagination || { page: 1, limit: 12, total: 0, pages: 0 });
     } catch (error) {
@@ -66,8 +66,13 @@ const SubadminDashboard: React.FC = () => {
   };
 
   const handleUpdateProperty = async (id: string, data: Partial<PropertyFormData>): Promise<boolean> => {
-    if (!user?.permissions.canUpdate) {
-      toast.error('You do not have permission to update properties');
+    // Subadmins can update properties they created OR if they have global update permission
+    const property = properties.find(p => p._id === id);
+    const isOwner = property?.createdBy === user?.id;
+    const hasUpdatePermission = user?.permissions.canUpdate;
+    
+    if (!hasUpdatePermission && !isOwner) {
+      toast.error('You can only update properties you created');
       return false;
     }
 
@@ -84,8 +89,13 @@ const SubadminDashboard: React.FC = () => {
   };
 
   const handleDeleteProperty = async (id: string): Promise<void> => {
-    if (!user?.permissions.canDelete) {
-      toast.error('You do not have permission to delete properties');
+    // Subadmins can delete properties they created OR if they have global delete permission
+    const property = properties.find(p => p._id === id);
+    const isOwner = property?.createdBy === user?.id;
+    const hasDeletePermission = user?.permissions.canDelete;
+    
+    if (!hasDeletePermission && !isOwner) {
+      toast.error('You can only delete properties you created');
       return;
     }
 
@@ -134,7 +144,12 @@ const SubadminDashboard: React.FC = () => {
 
             <section className="bg-white rounded-xl border p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Your Permissions</h3>
-              <PermissionsBadge permissions={user?.permissions || {}} />
+              <PermissionsBadge permissions={user?.permissions || {
+                canCreate: false,
+                canRead: false,
+                canUpdate: false,
+                canDelete: false
+              }} />
               <p className="mt-4 text-xs text-gray-500">
                 Permissions define what actions you can perform. Contact an admin to request changes.
               </p>
@@ -205,6 +220,7 @@ const SubadminDashboard: React.FC = () => {
           properties={properties}
           loading={loading}
           pagination={propertyPagination}
+          currentUser={user}
           onUpdate={handleUpdateProperty}
           onDelete={handleDeleteProperty}
           onPageChange={fetchProperties}

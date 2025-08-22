@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ScrollToTop from "./components/ScrollToTop";
 import Login from "./components/Login";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import SubadminDashboard from "./components/subadmin/SubadminDashboard";
@@ -16,6 +17,7 @@ import GamingZone from "./pages/GamingZone";
 import AboutUs from "./pages/AboutUs";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import Debug from "./pages/Debug";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollToTop />
         <AuthProvider>
           <Routes>
             {/* Public Routes */}
@@ -35,6 +38,7 @@ const App = () => (
             <Route path="/gaming-zone" element={<GamingZone />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/debug" element={<Debug />} />
 
             {/* Authentication Routes - PUBLIC */}
             <Route path="/login" element={<Login />} />

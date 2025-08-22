@@ -1,17 +1,30 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Target, Users, Shield, Award, TrendingUp, Heart, Zap, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useRef, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const AboutUs = () => {
+  const timelineRef = useRef<HTMLDivElement>(null);
+
+  // Ensure page starts from top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  const { scrollYProgress } = useScroll({
+    target: timelineRef,
+    offset: ["start center", "end center"]
+  });
+  
+  const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
   const stats = [
-    { label: "Happy Customers", value: "5000+", icon: Users },
-    { label: "Verified Properties", value: "1000+", icon: Shield },
-    { label: "Cities Covered", value: "25+", icon: TrendingUp },
-    { label: "Success Rate", value: "95%", icon: Award },
+    { label: "Student Focused", value: "100%", icon: Users },
+    { label: "Quality Assured", value: "Always", icon: Shield },
+    { label: "Local Coverage", value: "DTU Area", icon: TrendingUp },
+    { label: "Launch Year", value: "2025", icon: Award },
   ];
 
   const values = [
@@ -44,11 +57,6 @@ const AboutUs = () => {
       description: "Book accommodations and services instantly with our streamlined booking process."
     },
     {
-      icon: Shield,
-      title: "Secure Payments",
-      description: "Your transactions are protected with industry-standard security measures."
-    },
-    {
       icon: Users,
       title: "24/7 Support",
       description: "Our dedicated support team is available round the clock to assist you."
@@ -78,24 +86,24 @@ const AboutUs = () => {
 
   const journey = [
     {
-      year: "2021",
-      title: "The Beginning",
-      description: "Started with a vision to solve accommodation challenges in Bangalore"
+      year: "2025",
+      title: "The Idea",
+      description: "Identified the need for a trusted platform connecting students with quality local accommodations and services"
     },
     {
-      year: "2022", 
-      title: "First 100 Properties",
-      description: "Onboarded verified PGs and hostels across major tech hubs"
+      year: "2025", 
+      title: "Foundation Built",
+      description: "Developed the platform, established partnerships with verified properties around DTU area"
     },
     {
-      year: "2023",
-      title: "Expansion", 
-      description: "Added mess services, cafes, and gaming zones to our platform"
+      year: "2025",
+      title: "Platform Launch", 
+      description: "Officially launched PgNearU with curated listings for PGs, mess services, and gaming zones"
     },
     {
-      year: "2024",
-      title: "25 Cities",
-      description: "Expanded to 25+ cities with 1000+ verified properties and services"
+      year: "2025",
+      title: "Growing Community",
+      description: "Building our user base and expanding our network of trusted property partners"
     }
   ];
 
@@ -113,7 +121,7 @@ const AboutUs = () => {
             className="text-center max-w-4xl mx-auto"
           >
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-shadow-lg">
-              About LocalSpot Hub
+              About PgNearU
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed">
               We're on a mission to make finding quality local accommodations and services as easy as clicking a button. 
@@ -121,13 +129,13 @@ const AboutUs = () => {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Badge className="bg-white/20 text-white text-sm px-4 py-2">
-                Founded in 2021
+                Founded in 2025
               </Badge>
               <Badge className="bg-white/20 text-white text-sm px-4 py-2">
-                5000+ Happy Customers
+                Happy Customers
               </Badge>
               <Badge className="bg-white/20 text-white text-sm px-4 py-2">
-                25+ Cities
+                Expanding in Cities
               </Badge>
             </div>
           </motion.div>
@@ -231,14 +239,14 @@ const AboutUs = () => {
         >
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">
-              How LocalSpot Hub <span className="bg-gradient-hero bg-clip-text text-transparent">Works</span>
+              How PgNearU <span className="bg-gradient-hero bg-clip-text text-transparent">Works</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Our platform simplifies the entire process from search to booking
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
@@ -267,6 +275,7 @@ const AboutUs = () => {
 
         {/* Our Journey */}
         <motion.div
+          ref={timelineRef}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -283,33 +292,82 @@ const AboutUs = () => {
           </div>
 
           <div className="relative">
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-hero rounded-full"></div>
+            {/* Background Timeline Line */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-muted rounded-full"></div>
+            
+            {/* Animated Timeline Line that grows with scroll */}
+            <motion.div 
+              className="absolute left-1/2 transform -translate-x-1/2 w-1 bg-gradient-hero rounded-full origin-top"
+              style={{ height: lineHeight }}
+            ></motion.div>
+            
             <div className="space-y-12">
               {journey.map((milestone, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                   whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: index * 0.2 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ 
+                    duration: 0.8, 
+                    delay: index * 0.1,
+                    ease: "easeOut"
+                  }}
                   className={`flex items-center ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}
                 >
                   <div className={`w-1/2 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8'}`}>
-                    <Card className="border-0 shadow-medium">
-                      <CardContent className="p-6">
-                        <div className="text-2xl font-bold text-primary mb-2">
-                          {milestone.year}
-                        </div>
-                        <h3 className="text-lg font-semibold mb-2">
-                          {milestone.title}
-                        </h3>
-                        <p className="text-muted-foreground">
-                          {milestone.description}
-                        </p>
-                      </CardContent>
-                    </Card>
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      whileInView={{ scale: 1, opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ 
+                        duration: 0.6, 
+                        delay: index * 0.1 + 0.2,
+                        ease: "backOut"
+                      }}
+                    >
+                      <Card className="border-0 shadow-medium hover:shadow-large transition-all duration-300">
+                        <CardContent className="p-6">
+                          <motion.div 
+                            className="text-2xl font-bold text-primary mb-2"
+                            initial={{ scale: 0 }}
+                            whileInView={{ scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ 
+                              duration: 0.5, 
+                              delay: index * 0.1 + 0.3,
+                              type: "spring",
+                              stiffness: 200
+                            }}
+                          >
+                            {milestone.year}
+                          </motion.div>
+                          <h3 className="text-lg font-semibold mb-2">
+                            {milestone.title}
+                          </h3>
+                          <p className="text-muted-foreground">
+                            {milestone.description}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
                   </div>
-                  <div className="w-8 h-8 bg-gradient-primary rounded-full border-4 border-background shadow-medium z-10"></div>
+                  
+                  {/* Animated Timeline Dot */}
+                  <motion.div 
+                    className="w-8 h-8 bg-gradient-primary rounded-full border-4 border-background shadow-medium z-10"
+                    initial={{ scale: 0, rotate: -180 }}
+                    whileInView={{ scale: 1, rotate: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ 
+                      duration: 0.6, 
+                      delay: index * 0.1 + 0.1,
+                      type: "spring",
+                      stiffness: 300
+                    }}
+                    whileHover={{ scale: 1.2 }}
+                  ></motion.div>
+                  
                   <div className="w-1/2"></div>
                 </motion.div>
               ))}
@@ -377,13 +435,13 @@ const AboutUs = () => {
                 Ready to Find Your Perfect Space?
               </h2>
               <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                Join thousands of satisfied customers who found their ideal accommodation through LocalSpot Hub
+                Join thousands of satisfied customers who found their ideal accommodation through PgNearU
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Button size="lg" className="bg-white text-primary hover:bg-white/90">
                   Start Your Search
                 </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+                <Button size="lg" className="bg-white text-primary hover:bg-white/90">
                   List Your Property
                 </Button>
               </div>

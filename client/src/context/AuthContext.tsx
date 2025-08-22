@@ -70,24 +70,57 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userStr = localStorage.getItem('user');
-    
-    if (token && userStr) {
-      try {
-        const user = JSON.parse(userStr) as User;
-        dispatch({
-          type: 'LOGIN_SUCCESS',
-          payload: { token, user },
-        });
-      } catch (error) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+    const initializeAuth = async () => {
+      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
+      
+      if (token && userStr) {
+        try {
+          const user = JSON.parse(userStr) as User;
+          
+          // Validate token by making a test API call
+          try {
+            // Test if the token is still valid by calling a protected endpoint
+            const response = await fetch('http://localhost:5004/api/auth/profile', {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            });
+            
+            if (response.ok) {
+              const profileData = await response.json();
+              dispatch({
+                type: 'LOGIN_SUCCESS',
+                payload: { token, user: profileData.user || user },
+              });
+            } else {
+              // Token is invalid, clear storage
+              console.log('Token validation failed, clearing storage');
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              dispatch({ type: 'SET_LOADING', payload: false });
+            }
+          } catch (apiError) {
+            // If API call fails, still try to use stored data
+            console.warn('API validation failed, using stored user data:', apiError);
+            dispatch({
+              type: 'LOGIN_SUCCESS',
+              payload: { token, user },
+            });
+          }
+        } catch (parseError) {
+          console.error('Error parsing stored user data:', parseError);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          dispatch({ type: 'SET_LOADING', payload: false });
+        }
+      } else {
         dispatch({ type: 'SET_LOADING', payload: false });
       }
-    } else {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (credentials: LoginCredentials): Promise<LoginResponse> => {

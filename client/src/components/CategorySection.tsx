@@ -1,44 +1,41 @@
 import { motion } from "framer-motion";
-import { Building2, UtensilsCrossed, Gamepad2, Home, Wifi, Car, Shield, Clock } from "lucide-react";
+import { ChefHat, Joystick, Building, Wifi, Car, Shield, Clock, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const CategorySection = () => {
+  const navigate = useNavigate();
+
   const categories = [
     {
-      id: "pg-hostels",
-      title: "PGs & Hostels",
-      description: "Comfortable accommodations with modern amenities",
-      icon: Building2,
-      features: ["WiFi Included", "Mess Available", "24/7 Security", "Cleaning Service"],
-      gradient: "from-primary to-primary-hover",
-      listings: "500+",
+      id: "rooms-flats",
+      title: "Rooms & Flats",
+      description: "Private spaces for individuals and families",
+      icon: Building,
+      features: ["Wifi Included", "Mess Available", "24/7 Security", "Cleaning Service"],
+      gradient: "from-primary to-accent",
+      listings: "New",
+      route: "/pg-hostels",
     },
     {
       id: "mess-cafe",
       title: "Mess & Cafes",
       description: "Home-style meals and cozy workspaces",
-      icon: UtensilsCrossed,
+      icon: ChefHat,
       features: ["Daily Menus", "Flexible Plans", "Fresh Food", "AC Available"],
       gradient: "from-secondary to-secondary-hover",
-      listings: "300+",
+      listings: "Popular",
+      route: "/mess-cafe",
     },
     {
       id: "gaming-zone",
       title: "Gaming Zones",
       description: "Entertainment and gaming facilities",
-      icon: Gamepad2,
+      icon: Joystick,
       features: ["Latest Games", "Hourly Rates", "Tournaments", "Group Booking"],
       gradient: "from-accent to-accent-hover",
-      listings: "150+",
-    },
-    {
-      id: "rooms-flats",
-      title: "Rooms & Flats",
-      description: "Private spaces for individuals and families",
-      icon: Home,
-      features: ["Furnished", "Parking", "Flexible Lease", "Prime Locations"],
-      gradient: "from-primary to-accent",
-      listings: "200+",
+      listings: "Featured",
+      route: "/gaming-zone",
     },
   ];
 
@@ -91,7 +88,7 @@ const CategorySection = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {categories.map((category, index) => {
             const Icon = category.icon;
@@ -137,6 +134,10 @@ const CategorySection = () => {
                 <Button 
                   className="w-full group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-primary-hover transition-all duration-300"
                   variant="outline"
+                  onClick={() => {
+                    navigate(category.route);
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   Explore Now
                 </Button>
@@ -154,10 +155,10 @@ const CategorySection = () => {
           className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
         >
           {[
-            { label: "Total Listings", value: "1000+", icon: Building2 },
-            { label: "Happy Customers", value: "5000+", icon: Shield },
-            { label: "Cities Covered", value: "25+", icon: Car },
-            { label: "24/7 Support", value: "Available", icon: Clock },
+            { label: "Quality Verified", value: "100%", icon: Building2 },
+            { label: "Customer First", value: "Always", icon: Shield },
+            { label: "Local Focus", value: "DTU Area", icon: Car },
+            { label: "Support", value: "24/7", icon: Clock },
           ].map((stat, index) => {
             const StatIcon = stat.icon;
             return (

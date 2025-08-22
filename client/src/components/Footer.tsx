@@ -2,8 +2,74 @@ import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubscription = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email.trim()) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubscribing(true);
+
+    try {
+      const response = await fetch('http://localhost:5004/api/subscription/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "🎉 Successfully Subscribed!",
+          description: data.message,
+        });
+        setEmail(""); // Clear the input
+      } else {
+        toast({
+          title: "Subscription Failed",
+          description: data.message || "Failed to subscribe. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+      toast({
+        title: "Connection Error",
+        description: "Failed to connect to server. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
   const footerSections = [
     {
       title: "Quick Links",
@@ -55,8 +121,8 @@ const Footer = () => {
     {
       icon: Mail,
       label: "Email",
-      value: "support@localspothub.com",
-      href: "mailto:support@localspothub.com",
+      value: "support@pgnearu.com",
+      href: "mailto:support@pgnearu.com",
     },
     {
       icon: MapPin,
@@ -85,7 +151,7 @@ const Footer = () => {
                 <span className="text-white font-bold">LS</span>
               </div>
               <span className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-                LocalSpot Hub
+                PgNearU
               </span>
             </div>
 
@@ -166,22 +232,30 @@ const Footer = () => {
               <h3 className="text-2xl font-bold mb-3">
                 Stay Updated with{" "}
                 <span className="bg-gradient-hero bg-clip-text text-transparent">
-                  LocalSpot Hub
+                  <span className="font-bold text-lg">PgNearU</span>
                 </span>
               </h3>
               <p className="text-muted-foreground">
-                Get the latest listings, special offers, and platform updates delivered to your inbox.
+                Get the latest listings, special offers, and platform updates delivered to your inbox - completely free!
               </p>
             </div>
-            <div className="flex gap-3">
+            <form onSubmit={handleSubscription} className="flex gap-3">
               <Input
+                type="email"
                 placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="flex-1"
+                disabled={isSubscribing}
               />
-              <Button className="bg-gradient-primary hover:opacity-90 whitespace-nowrap">
-                Subscribe
+              <Button 
+                type="submit"
+                className="bg-gradient-primary hover:opacity-90 whitespace-nowrap"
+                disabled={isSubscribing}
+              >
+                {isSubscribing ? "Subscribing..." : "Subscribe"}
               </Button>
-            </div>
+            </form>
           </div>
         </motion.div>
 
@@ -197,7 +271,7 @@ const Footer = () => {
             {/* Copyright */}
             <div className="text-center md:text-left">
               <p className="text-muted-foreground text-sm">
-                © 2024 LocalSpot Hub. All rights reserved. Made with ❤️ in India
+                © 2024 PgNearU. All rights reserved. Made with ❤️ in India
               </p>
             </div>
 

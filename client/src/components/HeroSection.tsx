@@ -4,9 +4,11 @@ import { ChevronLeft, ChevronRight, MapPin, Calendar, IndianRupee } from "lucide
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
 
   const slides = [
     {
@@ -14,24 +16,27 @@ const HeroSection = () => {
       title: "Find Your Perfect PG & Hostel",
       subtitle: "Comfortable stays with all amenities",
       description: "Discover verified PGs and hostels with WiFi, mess facilities, and more",
-      image: "/api/placeholder/1200/600",
+      image: "/pg.jpg",
       cta: "Explore PGs",
+      route: "/pg-hostels",
     },
     {
       id: 2,
       title: "Delicious Mess & Cafe Options",
       subtitle: "Home-style food and cozy cafes",
       description: "Book mess services or find the perfect cafe for work and relaxation",
-      image: "/api/placeholder/1200/600",
+      image: "/mess.jpg",
       cta: "Find Food",
+      route: "/mess-cafe",
     },
     {
       id: 3,
       title: "Gaming Zones & Sports Areas",
       subtitle: "Entertainment and recreation",
       description: "Book gaming zones, sports facilities, and entertainment venues",
-      image: "/api/placeholder/1200/600",
+      image: "/gamingcafe.jpg",
       cta: "Book Now",
+      route: "/gaming-zone",
     },
   ];
 
@@ -51,7 +56,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative h-screen overflow-hidden">
+    <section className="relative h-[calc(100vh-120px)] overflow-hidden">
       {/* Background Carousel */}
       <div className="absolute inset-0">
         <AnimatePresence mode="wait">
@@ -61,8 +66,17 @@ const HeroSection = () => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.8 }}
-            className="absolute inset-0 bg-gradient-hero"
+            className="absolute inset-0"
           >
+            {slides[currentSlide].image.startsWith('/api/placeholder') ? (
+              <div className="absolute inset-0 bg-gradient-hero" />
+            ) : (
+              <img 
+                src={slides[currentSlide].image}
+                alt={slides[currentSlide].title}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-overlay" />
           </motion.div>
         </AnimatePresence>
@@ -108,15 +122,12 @@ const HeroSection = () => {
               <Button 
                 size="lg" 
                 className="bg-white text-primary hover:bg-white/90 hover-glow"
+                onClick={() => {
+                  navigate(slides[currentSlide].route);
+                  window.scrollTo(0, 0);
+                }}
               >
                 {slides[currentSlide].cta}
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-white text-white hover:bg-white hover:text-primary"
-              >
-                Learn More
               </Button>
             </motion.div>
           </motion.div>
@@ -145,15 +156,15 @@ const HeroSection = () => {
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pg-hostels">PG & Hostels</SelectItem>
+                    <SelectItem value="pg-hostels">PG & Flats</SelectItem>
                     <SelectItem value="mess-cafe">Mess & Cafe</SelectItem>
                     <SelectItem value="gaming-zone">Gaming Zone</SelectItem>
-                    <SelectItem value="rooms-flats">Rooms & Flats</SelectItem>
+                    {/* <SelectItem value="rooms-flats">Rooms & Flats</SelectItem> */}
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              {/* <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Check-in</label>
                   <div className="relative">
@@ -169,7 +180,7 @@ const HeroSection = () => {
                     <Input placeholder="Max price" className="pl-10" />
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               <Button className="w-full bg-gradient-primary hover:opacity-90" size="lg">
                 Search Now

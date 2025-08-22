@@ -1,27 +1,17 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, Clock, Send, MessageCircle } from "lucide-react";
+import { Phone, Mail, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const Contact = () => {
-  const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    subject: "",
-    category: "",
-    message: ""
-  });
+  // Ensure page starts from top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const contactInfo = [
     {
@@ -34,16 +24,9 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email Support", 
-      details: ["support@localspothub.com", "help@localspothub.com"],
+      details: ["support@pgnearu.com", "help@pgnearu.com"],
       description: "Send us your queries anytime",
       available: "Response within 2 hours"
-    },
-    {
-      icon: MapPin,
-      title: "Head Office",
-      details: ["123 Tech Park, Koramangala", "Bangalore, Karnataka 560034"],
-      description: "Visit us for in-person support",
-      available: "Mon-Sat, 9 AM - 6 PM"
     },
     {
       icon: MessageCircle,
@@ -52,13 +35,6 @@ const Contact = () => {
       description: "Quick support via WhatsApp",
       available: "24/7"
     }
-  ];
-
-  const officeHours = [
-    { day: "Monday - Friday", hours: "9:00 AM - 8:00 PM" },
-    { day: "Saturday", hours: "10:00 AM - 6:00 PM" },
-    { day: "Sunday", hours: "10:00 AM - 4:00 PM" },
-    { day: "Holidays", hours: "Emergency support only" }
   ];
 
   const faqItems = [
@@ -83,39 +59,6 @@ const Contact = () => {
       answer: "Contact our team through the 'List Your Property' option. We'll guide you through the verification process and help you get listed."
     }
   ];
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.message) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: "Message Sent!",
-      description: "We'll get back to you within 2 hours.",
-    });
-
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      subject: "",
-      category: "",
-      message: ""
-    });
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -159,7 +102,7 @@ const Contact = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16"
         >
           {contactInfo.map((info, index) => {
             const Icon = info.icon;
@@ -197,158 +140,6 @@ const Contact = () => {
             );
           })}
         </motion.div>
-
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <Card className="border-0 shadow-large">
-              <CardHeader>
-                <CardTitle className="text-2xl">Send us a Message</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Full Name *</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => handleInputChange("name", e.target.value)}
-                        placeholder="Enter your full name"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Address *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange("email", e.target.value)}
-                        placeholder="Enter your email"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                        placeholder="Enter your phone number"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="category">Category</Label>
-                      <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="booking">Booking Support</SelectItem>
-                          <SelectItem value="property">Property Inquiry</SelectItem>
-                          <SelectItem value="technical">Technical Issue</SelectItem>
-                          <SelectItem value="feedback">Feedback</SelectItem>
-                          <SelectItem value="partnership">Partnership</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
-                    <Input
-                      id="subject"
-                      value={formData.subject}
-                      onChange={(e) => handleInputChange("subject", e.target.value)}
-                      placeholder="Brief subject of your message"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Message *</Label>
-                    <Textarea
-                      id="message"
-                      value={formData.message}
-                      onChange={(e) => handleInputChange("message", e.target.value)}
-                      placeholder="Describe your query in detail..."
-                      rows={5}
-                      required
-                    />
-                  </div>
-
-                  <Button type="submit" className="w-full bg-gradient-primary hover:opacity-90" size="lg">
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Message
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Additional Info */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="space-y-8"
-          >
-            {/* Office Hours */}
-            <Card className="border-0 shadow-medium">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-primary" />
-                  Office Hours
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {officeHours.map((schedule, index) => (
-                    <div key={index} className="flex justify-between items-center py-2 border-b last:border-b-0">
-                      <span className="font-medium">{schedule.day}</span>
-                      <span className="text-muted-foreground">{schedule.hours}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Map Placeholder */}
-            <Card className="border-0 shadow-medium">
-              <CardHeader>
-                <CardTitle>Find Us</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">Interactive Map</p>
-                    <p className="text-sm text-muted-foreground">123 Tech Park, Koramangala</p>
-                    <p className="text-sm text-muted-foreground">Bangalore, Karnataka 560034</p>
-                  </div>
-                </div>
-                <div className="mt-4 space-y-2">
-                  <Button variant="outline" className="w-full">
-                    Get Directions
-                  </Button>
-                  <Button variant="ghost" className="w-full">
-                    View on Google Maps
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
 
         {/* FAQ Section */}
         <motion.div
@@ -410,7 +201,7 @@ const Contact = () => {
                   <Phone className="h-4 w-4 mr-2" />
                   Call +91 98765 43210
                 </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+                <Button size="lg" className="bg-white text-primary hover:bg-white/90">
                   <MessageCircle className="h-4 w-4 mr-2" />
                   WhatsApp Support
                 </Button>

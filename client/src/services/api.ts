@@ -6,7 +6,7 @@ import {
   PropertyFormData
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004/api';
 
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -77,10 +77,13 @@ export const propertyAPI = {
     console.log('Sending property data:', data);
     return api.post('/properties', data);
   },
-  getAllProperties: (params = {}) => api.get('/properties', { params }),
-  getPropertyById: (id: string) => api.get(`/properties/${id}`),
+  getAllProperties: (params = {}) => api.get('/properties/public', { params }), // Use public endpoint
+  getPropertyById: (id: string) => api.get(`/properties/public/${id}`), // Use public endpoint
   updateProperty: (id: string, data: Partial<PropertyFormData>) => api.put(`/properties/${id}`, data),
   deleteProperty: (id: string) => api.delete(`/properties/${id}`),
+  // Admin endpoints (require auth)
+  getAllPropertiesAdmin: (params = {}) => api.get('/properties', { params }),
+  getPropertyByIdAdmin: (id: string) => api.get(`/properties/${id}`),
 };
 
 export default api;

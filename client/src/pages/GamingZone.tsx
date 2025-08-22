@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Star, MapPin, Clock, IndianRupee, Gamepad2, Users, Trophy, Wifi, Calendar, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,11 @@ import Footer from "@/components/Footer";
 
 const GamingZone = () => {
   const [selectedZone, setSelectedZone] = useState(null);
+
+  // Ensure page starts from top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const gamingZones = [
     {

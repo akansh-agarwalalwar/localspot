@@ -10,7 +10,7 @@ const TestimonialsSection = () => {
       role: "Software Engineer",
       location: "Bangalore",
       rating: 5,
-      text: "Found the perfect PG through LocalSpot Hub! The booking process was seamless and the amenities were exactly as described. Highly recommended for anyone looking for quality accommodation.",
+      text: "Found the perfect PG through PgNearU! The booking process was seamless and the amenities were exactly as described. Highly recommended for anyone looking for quality accommodation.",
       avatar: "/api/placeholder/60/60",
       category: "PG Booking",
     },
@@ -40,7 +40,7 @@ const TestimonialsSection = () => {
       role: "Freelancer",
       location: "Chennai",
       rating: 5,
-      text: "LocalSpot Hub is a game-changer! Found a cozy cafe with great WiFi for my work sessions. The platform's search filters helped me find exactly what I needed.",
+      text: "PgNearU is a game-changer! Found a cozy cafe with great WiFi for my work sessions. The platform's search filters helped me find exactly what I needed.",
       avatar: "/api/placeholder/60/60",
       category: "Cafe Booking",
     },
@@ -60,7 +60,7 @@ const TestimonialsSection = () => {
       role: "Startup Founder",
       location: "Bangalore",
       rating: 5,
-      text: "As a startup founder, I appreciate efficiency. LocalSpot Hub delivered exactly that - quick, reliable bookings with verified listings. Will definitely use again!",
+      text: "As a startup founder, I appreciate efficiency. PgNearU delivered exactly that - quick, reliable bookings with verified listings. Will definitely use again!",
       avatar: "/api/placeholder/60/60",
       category: "Co-working Space",
     },
@@ -106,7 +106,7 @@ const TestimonialsSection = () => {
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Real experiences from real customers who found their perfect match through LocalSpot Hub
+            Real experiences from real customers who found their perfect match through PgNearU
           </p>
         </motion.div>
 
@@ -195,10 +195,10 @@ const TestimonialsSection = () => {
           <div className="bg-card rounded-2xl p-8 shadow-medium">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               {[
-                { label: "Happy Customers", value: "5000+", color: "text-primary" },
-                { label: "Average Rating", value: "4.8/5", color: "text-secondary" },
-                { label: "Successful Bookings", value: "25000+", color: "text-accent" },
-                { label: "Customer Retention", value: "94%", color: "text-success" },
+                { label: "Quality Focus", value: "100%", color: "text-primary" },
+                { label: "Launch Ready", value: "2025", color: "text-secondary" },
+                { label: "Local Expertise", value: "DTU", color: "text-accent" },
+                { label: "Student Focused", value: "Always", color: "text-success" },
               ].map((stat, index) => (
                 <motion.div
                   key={index}

@@ -14,7 +14,27 @@ const CreateProperty: React.FC<CreatePropertyProps> = ({ onSubmit, loading = fal
     description: '',
     price: 0,
     location: '',
+    amenities: {
+      ac: false,
+      wifi: false,
+      ro: false,
+      mess: false,
+      securityGuard: false,
+      maid: false,
+      parking: false,
+      laundry: false,
+      powerBackup: false,
+      cctv: false,
+    },
+    roomTypes: {
+      single: false,
+      double: false,
+      triple: false,
+      dormitory: false,
+    },
     pics: [''],
+    coverPhoto: '',
+    facilityPhotos: [''],
   });
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -38,6 +58,29 @@ const CreateProperty: React.FC<CreatePropertyProps> = ({ onSubmit, loading = fal
       errors.location = 'Location is required';
     }
 
+    // Validate cover photo
+    if (!formData.coverPhoto.trim()) {
+      errors.coverPhoto = 'Cover photo is required';
+    } else {
+      const url = formData.coverPhoto.trim();
+      if (!/^https?:\/\/.+\..+/.test(url)) {
+        errors.coverPhoto = 'Please provide a valid cover photo URL (must start with http:// or https://)';
+      }
+    }
+
+    // Validate facility photos (optional)
+    const validFacilityPhotos = formData.facilityPhotos.filter(pic => pic.trim() !== '');
+    if (validFacilityPhotos.length > 0) {
+      const invalidUrls = validFacilityPhotos.filter(pic => {
+        const url = pic.trim();
+        return !/^https?:\/\/.+\..+/.test(url);
+      });
+      if (invalidUrls.length > 0) {
+        errors.facilityPhotos = 'Please provide valid facility photo URLs (must start with http:// or https://)';
+      }
+    }
+
+    // Keep original pics validation for backward compatibility
     const validPics = formData.pics.filter(pic => pic.trim() !== '');
     if (validPics.length === 0) {
       errors.pics = 'At least one image URL is required';
@@ -71,6 +114,26 @@ const CreateProperty: React.FC<CreatePropertyProps> = ({ onSubmit, loading = fal
         [name]: '',
       }));
     }
+  };
+
+  const handleAmenityChange = (amenity: keyof PropertyFormData['amenities']): void => {
+    setFormData(prev => ({
+      ...prev,
+      amenities: {
+        ...prev.amenities,
+        [amenity]: !prev.amenities[amenity],
+      },
+    }));
+  };
+
+  const handleRoomTypeChange = (roomType: keyof PropertyFormData['roomTypes']): void => {
+    setFormData(prev => ({
+      ...prev,
+      roomTypes: {
+        ...prev.roomTypes,
+        [roomType]: !prev.roomTypes[roomType],
+      },
+    }));
   };
 
   const handlePicChange = (index: number, value: string): void => {
@@ -107,6 +170,57 @@ const CreateProperty: React.FC<CreatePropertyProps> = ({ onSubmit, loading = fal
     }
   };
 
+  // Cover photo handlers
+  const handleCoverPhotoChange = (value: string): void => {
+    setFormData(prev => ({
+      ...prev,
+      coverPhoto: value,
+    }));
+    
+    // Clear validation error for this field
+    if (validationErrors.coverPhoto) {
+      setValidationErrors(prev => ({
+        ...prev,
+        coverPhoto: '',
+      }));
+    }
+  };
+
+  // Facility photos handlers
+  const handleFacilityPhotoChange = (index: number, value: string): void => {
+    const newFacilityPhotos = [...formData.facilityPhotos];
+    newFacilityPhotos[index] = value;
+    setFormData(prev => ({
+      ...prev,
+      facilityPhotos: newFacilityPhotos,
+    }));
+    
+    // Clear validation error for this field
+    if (validationErrors.facilityPhotos) {
+      setValidationErrors(prev => ({
+        ...prev,
+        facilityPhotos: '',
+      }));
+    }
+  };
+
+  const addFacilityPhotoField = (): void => {
+    setFormData(prev => ({
+      ...prev,
+      facilityPhotos: [...prev.facilityPhotos, ''],
+    }));
+  };
+
+  const removeFacilityPhotoField = (index: number): void => {
+    if (formData.facilityPhotos.length > 1) {
+      const newFacilityPhotos = formData.facilityPhotos.filter((_, i) => i !== index);
+      setFormData(prev => ({
+        ...prev,
+        facilityPhotos: newFacilityPhotos,
+      }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     
@@ -131,7 +245,27 @@ const CreateProperty: React.FC<CreatePropertyProps> = ({ onSubmit, loading = fal
           description: '',
           price: 0,
           location: '',
+          amenities: {
+            ac: false,
+            wifi: false,
+            ro: false,
+            mess: false,
+            securityGuard: false,
+            maid: false,
+            parking: false,
+            laundry: false,
+            powerBackup: false,
+            cctv: false,
+          },
+          roomTypes: {
+            single: false,
+            double: false,
+            triple: false,
+            dormitory: false,
+          },
           pics: [''],
+          coverPhoto: '',
+          facilityPhotos: [''],
         });
         setValidationErrors({});
       }
@@ -257,11 +391,236 @@ const CreateProperty: React.FC<CreatePropertyProps> = ({ onSubmit, loading = fal
             </div>
           </div>
 
-          {/* Image Links */}
+          {/* Amenities Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+              Amenities Available
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {[
+                { key: 'ac', label: 'Air Conditioning', icon: '❄️' },
+                { key: 'wifi', label: 'WiFi', icon: '📶' },
+                { key: 'ro', label: 'RO Water', icon: '💧' },
+                { key: 'mess', label: 'Mess Facility', icon: '🍽️' },
+                { key: 'securityGuard', label: 'Security Guard', icon: '🛡️' },
+                { key: 'maid', label: 'Maid Service', icon: '🧹' },
+                { key: 'parking', label: 'Parking', icon: '🅿️' },
+                { key: 'laundry', label: 'Laundry', icon: '👕' },
+                { key: 'powerBackup', label: 'Power Backup', icon: '🔋' },
+                { key: 'cctv', label: 'CCTV Security', icon: '📹' },
+              ].map((amenity) => (
+                <label
+                  key={amenity.key}
+                  className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                    formData.amenities[amenity.key as keyof PropertyFormData['amenities']]
+                      ? 'border-green-500 bg-green-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={formData.amenities[amenity.key as keyof PropertyFormData['amenities']]}
+                    onChange={() => handleAmenityChange(amenity.key as keyof PropertyFormData['amenities'])}
+                    disabled={isSubmitting || loading}
+                    className="sr-only"
+                  />
+                  <div className="flex flex-col items-center text-center">
+                    <span className="text-2xl mb-1">{amenity.icon}</span>
+                    <span className="text-sm font-medium text-gray-700">{amenity.label}</span>
+                  </div>
+                  {formData.amenities[amenity.key as keyof PropertyFormData['amenities']] && (
+                    <div className="absolute top-1 right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                  )}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Room Types Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+              Room Types Available
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { key: 'single', label: 'Single Room', icon: '🛏️', description: 'Single occupancy' },
+                { key: 'double', label: 'Double Room', icon: '🛏️🛏️', description: 'Double occupancy' },
+                { key: 'triple', label: 'Triple Room', icon: '🛏️🛏️🛏️', description: 'Triple occupancy' },
+                { key: 'dormitory', label: 'Dormitory', icon: '🏠', description: 'Shared accommodation' },
+              ].map((roomType) => (
+                <label
+                  key={roomType.key}
+                  className={`flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-all relative ${
+                    formData.roomTypes[roomType.key as keyof PropertyFormData['roomTypes']]
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={formData.roomTypes[roomType.key as keyof PropertyFormData['roomTypes']]}
+                    onChange={() => handleRoomTypeChange(roomType.key as keyof PropertyFormData['roomTypes'])}
+                    disabled={isSubmitting || loading}
+                    className="sr-only"
+                  />
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">{roomType.icon}</div>
+                    <h4 className="font-medium text-gray-900">{roomType.label}</h4>
+                    <p className="text-sm text-gray-500 mt-1">{roomType.description}</p>
+                  </div>
+                  {formData.roomTypes[roomType.key as keyof PropertyFormData['roomTypes']] && (
+                    <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm">✓</span>
+                    </div>
+                  )}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Cover Photo Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+              Cover Photo * <span className="text-sm font-normal text-gray-500">(Main display image)</span>
+            </h3>
+
+            <div className="bg-green-50 border border-green-200 rounded-md p-3">
+              <p className="text-sm text-green-800">
+                📌 <strong>Cover Photo Guidelines:</strong>
+              </p>
+              <ul className="text-sm text-green-700 mt-2 ml-4 list-disc">
+                <li>This will be the main image shown on listings and home page</li>
+                <li>Use high-quality exterior or main view of the property</li>
+                <li>Should represent the property best</li>
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <input
+                  type="url"
+                  value={formData.coverPhoto}
+                  onChange={(e) => handleCoverPhotoChange(e.target.value)}
+                  disabled={isSubmitting || loading}
+                  className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 transition-colors ${
+                    validationErrors.coverPhoto
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                      : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
+                  }`}
+                  placeholder="https://drive.google.com/file/d/... or direct image URL"
+                />
+                
+                {/* Cover Photo Preview */}
+                {formData.coverPhoto && validateImageUrl(formData.coverPhoto) && (
+                  <div className="ml-2">
+                    <div className="text-xs text-gray-500 mb-1">Cover Photo Preview:</div>
+                    <div className="w-48 h-32 border rounded overflow-hidden">
+                      <PropertyImage
+                        src={formData.coverPhoto}
+                        alt="Cover Photo Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                {formData.coverPhoto && !validateImageUrl(formData.coverPhoto) && (
+                  <div className="ml-2 text-xs text-red-500">
+                    Invalid URL format. Please provide a Google Drive link or direct image URL.
+                  </div>
+                )}
+              </div>
+            </div>
+            {validationErrors.coverPhoto && (
+              <p className="text-sm text-red-600">{validationErrors.coverPhoto}</p>
+            )}
+          </div>
+
+          {/* Facility Photos Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium text-gray-900">
-                Image Links (Google Drive) *
+                Facility Photos <span className="text-sm font-normal text-gray-500">(Optional - Interior, amenities, rooms)</span>
+              </h3>
+              <button
+                type="button"
+                onClick={addFacilityPhotoField}
+                disabled={isSubmitting || loading}
+                className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors"
+              >
+                Add Photo
+              </button>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+              <p className="text-sm text-blue-800">
+                � <strong>Facility Photos Guidelines:</strong>
+              </p>
+              <ul className="text-sm text-blue-700 mt-2 ml-4 list-disc">
+                <li>Show interior rooms, common areas, amenities</li>
+                <li>Multiple photos help users understand the property better</li>
+                <li>These will be displayed in the property details gallery</li>
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              {formData.facilityPhotos.map((photo, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={photo}
+                      onChange={(e) => handleFacilityPhotoChange(index, e.target.value)}
+                      disabled={isSubmitting || loading}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="https://drive.google.com/file/d/... or direct image URL"
+                    />
+                    {formData.facilityPhotos.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeFacilityPhotoField(index)}
+                        disabled={isSubmitting || loading}
+                        className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Facility Photo Preview */}
+                  {photo && validateImageUrl(photo) && (
+                    <div className="ml-2">
+                      <div className="text-xs text-gray-500 mb-1">Preview:</div>
+                      <div className="w-32 h-24 border rounded overflow-hidden">
+                        <PropertyImage
+                          src={photo}
+                          alt={`Facility Preview ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {photo && !validateImageUrl(photo) && (
+                    <div className="ml-2 text-xs text-red-500">
+                      Invalid URL format. Please provide a Google Drive link or direct image URL.
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            {validationErrors.facilityPhotos && (
+              <p className="text-sm text-red-600">{validationErrors.facilityPhotos}</p>
+            )}
+          </div>
+
+          {/* Legacy Image Links (for backward compatibility) */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium text-gray-900">
+                Image Links (Legacy) *
               </h3>
               <button
                 type="button"
@@ -273,19 +632,10 @@ const CreateProperty: React.FC<CreatePropertyProps> = ({ onSubmit, loading = fal
               </button>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-              <p className="text-sm text-blue-800">
-                📌 <strong>Supported image sources:</strong>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+              <p className="text-sm text-yellow-800">
+                ⚠️ <strong>Note:</strong> This section is for backward compatibility. Please use Cover Photo and Facility Photos sections above for new properties.
               </p>
-              <ul className="text-sm text-blue-700 mt-2 ml-4 list-disc">
-                <li><strong>Google Drive:</strong> Share link and we'll convert it automatically</li>
-                <li><strong>Direct images:</strong> URLs ending in .jpg, .png, .gif, etc.</li>
-                <li><strong>Image hosts:</strong> Imgur, Cloudinary, AWS S3, etc.</li>
-                <li><strong>Any HTTPS URL:</strong> That serves images</li>
-              </ul>
-              <div className="mt-3 p-2 bg-blue-100 rounded text-xs text-blue-600">
-                <strong>Example:</strong> https://drive.google.com/file/d/1jpsSuHz1iS0HXjZMC_h7YG_ZUGhq9dew/view
-              </div>
             </div>
 
             <div className="space-y-3">
@@ -349,7 +699,27 @@ const CreateProperty: React.FC<CreatePropertyProps> = ({ onSubmit, loading = fal
                   description: '',
                   price: 0,
                   location: '',
+                  amenities: {
+                    ac: false,
+                    wifi: false,
+                    ro: false,
+                    mess: false,
+                    securityGuard: false,
+                    maid: false,
+                    parking: false,
+                    laundry: false,
+                    powerBackup: false,
+                    cctv: false,
+                  },
+                  roomTypes: {
+                    single: false,
+                    double: false,
+                    triple: false,
+                    dormitory: false,
+                  },
                   pics: [''],
+                  coverPhoto: '',
+                  facilityPhotos: [''],
                 });
                 setValidationErrors({});
               }}

@@ -30,7 +30,7 @@ export interface Pagination {
 export interface Activity {
   _id: string;
   userId: string | User;
-  action: 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT';
+  action: 'CREATE' | 'READ' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'SIGNUP' | 'BOOKING';
   resource: string;
   resourceId?: string | null;
   details?: string;
@@ -86,7 +86,27 @@ export interface Property {
   description: string;
   price: number;
   location: string;
+  amenities: {
+    ac: boolean;
+    wifi: boolean;
+    ro: boolean; // RO Water
+    mess: boolean;
+    securityGuard: boolean;
+    maid: boolean;
+    parking: boolean;
+    laundry: boolean;
+    powerBackup: boolean;
+    cctv: boolean;
+  };
+  roomTypes: {
+    single: boolean;
+    double: boolean;
+    triple: boolean;
+    dormitory: boolean;
+  };
   pics: string[]; // Array of Google Drive links
+  coverPhoto?: string; // Single cover photo URL
+  facilityPhotos?: string[]; // Array of facility/interior photos
   createdBy: string | User;
   isActive: boolean;
   createdAt: string;
@@ -98,5 +118,25 @@ export interface PropertyFormData {
   description: string;
   price: number;
   location: string;
+  amenities: {
+    ac: boolean;
+    wifi: boolean;
+    ro: boolean;
+    mess: boolean;
+    securityGuard: boolean;
+    maid: boolean;
+    parking: boolean;
+    laundry: boolean;
+    powerBackup: boolean;
+    cctv: boolean;
+  };
+  roomTypes: {
+    single: boolean;
+    double: boolean;
+    triple: boolean;
+    dormitory: boolean;
+  };
   pics: string[];
+  coverPhoto: string; // Single cover photo URL (required)
+  facilityPhotos: string[]; // Array of facility/interior photos
 }

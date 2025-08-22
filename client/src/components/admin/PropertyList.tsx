@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Property, Pagination, PropertyFormData } from '../../types';
+import { Property, Pagination, PropertyFormData, User } from '../../types';
 import { convertGoogleDriveUrl, getImagePreviewUrl, extractGoogleDriveFileId } from '../../utils/imageUtils';
 import PropertyImage from '../common/PropertyImage';
+import PropertyAmenities from '../common/PropertyAmenities';
 
 interface PropertyListProps {
   properties: Property[];
   loading: boolean;
   pagination: Pagination;
+  currentUser?: User | null;
   onUpdate: (id: string, data: Partial<PropertyFormData>) => Promise<boolean>;
   onDelete: (id: string) => Promise<void>;
   onPageChange: (page: number) => Promise<void>;
@@ -16,12 +18,32 @@ const PropertyList: React.FC<PropertyListProps> = ({
   properties, 
   loading, 
   pagination, 
+  currentUser,
   onUpdate, 
   onDelete, 
   onPageChange 
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+
+  // Helper function to check if user can edit/delete a property
+  const canModifyProperty = (property: Property, action: 'update' | 'delete') => {
+    if (!currentUser) return false;
+    
+    // Admin can modify any property
+    if (currentUser.role === 'admin') return true;
+    
+    // Check if user owns the property
+    const isOwner = property.createdBy === currentUser.id;
+    
+    // Check if user has global permission
+    const hasPermission = action === 'update' 
+      ? currentUser.permissions.canUpdate 
+      : currentUser.permissions.canDelete;
+    
+    // Subadmin can modify if they own it OR have global permission
+    return isOwner || hasPermission;
+  };
 
   const filteredProperties = properties.filter(property => {
     const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -159,6 +181,15 @@ const PropertyList: React.FC<PropertyListProps> = ({
                       <span className="text-sm text-gray-500">{property.location}</span>
                     </div>
 
+                    {/* Amenities and Room Types */}
+                    <div className="mb-3">
+                      <PropertyAmenities 
+                        property={property} 
+                        compact={true} 
+                        className="text-xs"
+                      />
+                    </div>
+
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-gray-500">
                         {new Date(property.createdAt).toLocaleDateString()}
@@ -196,12 +227,15 @@ const PropertyList: React.FC<PropertyListProps> = ({
                         >
                           📁
                         </button>
-                        <button
-                          onClick={() => onDelete(property._id)}
-                          className="text-xs px-3 py-1 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-medium"
-                        >
-                          🗑️ Delete
-                        </button>
+                        {canModifyProperty(property, 'delete') && (
+                          <button
+                            onClick={() => onDelete(property._id)}
+                            className="text-xs px-3 py-1 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-medium"
+                            title={`Delete ${property.title}`}
+                          >
+                            🗑️ Delete
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

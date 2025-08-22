@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Star, MapPin, Clock, IndianRupee, Utensils, Coffee, Users, Wifi, Eye, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,11 @@ import Footer from "@/components/Footer";
 
 const MessCafe = () => {
   const [activeTab, setActiveTab] = useState("all");
+
+  // Ensure page starts from top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const messListings = [
     {

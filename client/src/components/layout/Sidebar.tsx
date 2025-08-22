@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
     >
       <div className="h-16 flex items-center px-5 border-b">
         <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent select-none">
-          Localspot {user?.role === 'admin' ? 'Admin' : 'Panel'}
+          PgNearU {user?.role === 'admin' ? 'Admin' : 'Panel'}
         </span>
       </div>
 

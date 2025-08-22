@@ -3,9 +3,11 @@ import { motion } from "framer-motion";
 import { Search, Bell, Phone, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const navItems = [
     { label: "PG / Hostels", href: "/pg-hostels" },
@@ -26,8 +28,8 @@ const Header = () => {
       >
         <div className="container mx-auto flex items-center justify-between text-sm">
           <div className="flex items-center gap-4">
-            <span className="font-semibold">LocalSpot Hub</span>
-            <span className="hidden md:inline">Your Local Booking Platform</span>
+            <span className="font-bold text-lg bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">PgNearU</span>
+            <span className="hidden md:inline text-primary-foreground/90">Find best room online at a single place</span>
           </div>
           <div className="flex items-center gap-4">
             <Button
@@ -36,7 +38,7 @@ const Header = () => {
               className="text-primary-foreground hover:bg-primary-hover"
             >
               <Phone className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">+91 98765 43210</span>
+              <span className="hidden sm:inline">+91 88520 19731</span>
             </Button>
             <Button
               variant="ghost"
@@ -56,19 +58,22 @@ const Header = () => {
         transition={{ duration: 0.6, delay: 0.1 }}
         className="glass-effect border-b"
       >
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-2">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <motion.div 
               whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center w-fit h-fit overflow-hidden cursor-pointer"
+              onClick={() => {
+                navigate('/');
+                window.scrollTo(0, 0);
+              }}
             >
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">LS</span>
-              </div>
-              <span className="text-xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-                LocalSpot
-              </span>
+              <img 
+                src="/logo.png" 
+                alt="PgNearU Logo" 
+                className="h-12 w-auto object-contain"
+              />
             </motion.div>
 
             {/* Search Bar - Desktop */}

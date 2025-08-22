@@ -46,7 +46,7 @@ const AdminDashboard: React.FC = () => {
   const fetchProperties = async (page = 1): Promise<void> => {
     try {
       setLoading(true);
-      const response = await propertyAPI.getAllProperties({ page, limit: propertyPagination.limit });
+      const response = await propertyAPI.getAllPropertiesAdmin({ page, limit: propertyPagination.limit });
       setProperties(response.data.properties || []);
       setPropertyPagination(response.data.pagination || { page: 1, limit: 12, total: 0, pages: 0 });
     } catch (error) {
@@ -252,6 +252,7 @@ const AdminDashboard: React.FC = () => {
           properties={properties}
           loading={loading}
           pagination={propertyPagination}
+          currentUser={user}
           onUpdate={handleUpdateProperty}
           onDelete={handleDeleteProperty}
           onPageChange={fetchProperties}

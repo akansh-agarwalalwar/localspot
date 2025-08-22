@@ -2,9 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LocalSpot Hub Design System - Premium, Modern, Local-Friendly */
+/* PgNearU Design System - Premium, Modern, Local-Friendly */
 
 @layer base {
+  /* Smooth scrolling for better UX */
+  html {
+    scroll-behavior: smooth;
+  }
+  
   :root {
     /* Core Background & Text */
     --background: 0 0% 100%;
