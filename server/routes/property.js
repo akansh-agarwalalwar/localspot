@@ -10,7 +10,11 @@ const { authenticateToken, authorizeRole, authorizePermission } = require('../mi
 
 const router = express.Router();
 
-// All routes require authentication
+// Public routes (no authentication required)
+router.get('/public', getAllProperties); // Public access to view properties
+router.get('/public/:id', getPropertyById); // Public access to view individual property
+
+// All admin routes require authentication
 router.use(authenticateToken);
 
 // Admin can access all properties
@@ -30,29 +34,15 @@ router.post('/',
     createProperty
 );
 
-// Update property - requires canUpdate permission or ownership
+// Update property - requires canUpdate permission OR ownership (for subadmins)
 router.put('/:id', 
     authorizeRole('admin', 'subadmin'),
-    (req, res, next) => {
-        if (req.user.role === 'admin' || req.user.permissions.canUpdate) {
-            next();
-        } else {
-            return res.status(403).json({ message: 'Missing update permission' });
-        }
-    },
     updateProperty
 );
 
-// Delete property - requires canDelete permission or ownership
+// Delete property - requires canDelete permission OR ownership (for subadmins)
 router.delete('/:id', 
     authorizeRole('admin', 'subadmin'),
-    (req, res, next) => {
-        if (req.user.role === 'admin' || req.user.permissions.canDelete) {
-            next();
-        } else {
-            return res.status(403).json({ message: 'Missing delete permission' });
-        }
-    },
     deleteProperty
 );
 

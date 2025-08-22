@@ -66,11 +66,17 @@ const getAllSubadmins = async (req, res) => {
 
         const total = await User.countDocuments({ role: 'subadmin' });
 
+        // Transform _id to id for frontend compatibility
+        const transformedSubadmins = subadmins.map(subadmin => ({
+            ...subadmin.toObject(),
+            id: subadmin._id.toString(),
+        }));
+
         await logActivity(req.user._id, 'READ', 'SUBADMIN', null, 
             `Retrieved subadmins list (page ${page})`, req.ip, req.get('User-Agent'));
 
         res.json({
-            subadmins,
+            subadmins: transformedSubadmins,
             pagination: {
                 page,
                 limit,
@@ -98,7 +104,13 @@ const getSubadminById = async (req, res) => {
         await logActivity(req.user._id, 'READ', 'SUBADMIN', id, 
             `Retrieved subadmin: ${subadmin.username}`, req.ip, req.get('User-Agent'));
 
-        res.json({ subadmin });
+        // Transform _id to id for frontend compatibility
+        const transformedSubadmin = {
+            ...subadmin.toObject(),
+            id: subadmin._id.toString(),
+        };
+
+        res.json({ subadmin: transformedSubadmin });
     } catch (error) {
         console.error('Get subadmin error:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -144,14 +156,31 @@ const updateSubadmin = async (req, res) => {
 
 const deleteSubadmin = async (req, res) => {
     try {
+        console.log('Delete subadmin request received:', req.params.id);
+        console.log('Request user:', req.user ? req.user.username : 'NO USER', 'Role:', req.user ? req.user.role : 'NO ROLE');
+        console.log('User permissions:', req.user ? req.user.permissions : 'NO PERMISSIONS');
+        
         const { id } = req.params;
+        
+        // Validate MongoDB ObjectId
+        const mongoose = require('mongoose');
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            console.log('Invalid ObjectId:', id);
+            return res.status(400).json({ message: 'Invalid subadmin ID format' });
+        }
+        
+        console.log('Looking for subadmin with ID:', id);
         const subadmin = await User.findOne({ _id: id, role: 'subadmin' });
 
         if (!subadmin) {
+            console.log('Subadmin not found with id:', id);
             return res.status(404).json({ message: 'Subadmin not found' });
         }
 
-        await User.findByIdAndDelete(id);
+        console.log('Found subadmin to delete:', subadmin.username, 'with _id:', subadmin._id);
+        
+        const deletedSubadmin = await User.findByIdAndDelete(id);
+        console.log('Subadmin deleted:', deletedSubadmin ? 'Success' : 'Failed');
 
         await logActivity(req.user._id, 'DELETE', 'SUBADMIN', id, 
             `Deleted subadmin: ${subadmin.username}`, req.ip, req.get('User-Agent'));
@@ -159,7 +188,8 @@ const deleteSubadmin = async (req, res) => {
         res.json({ message: 'Subadmin deleted successfully' });
     } catch (error) {
         console.error('Delete subadmin error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error('Error stack:', error.stack);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
 

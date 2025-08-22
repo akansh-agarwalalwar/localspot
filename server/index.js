@@ -8,11 +8,13 @@ const subadminRoutes = require('./routes/subadmin');
 const activityRoutes = require('./routes/activity');
 const setupRoutes = require('./routes/setup');
 const propertyRoutes = require('./routes/property');
+const subscriptionRoutes = require('./routes/subscription');
+const bookingRoutes = require('./routes/booking');
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5004;
 
 // Middleware
 app.use(cors());
@@ -34,6 +36,8 @@ app.use('/api/subadmin', subadminRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/setup', setupRoutes);
 app.use('/api/properties', propertyRoutes);
+app.use('/api/subscription', subscriptionRoutes);
+app.use('/api/booking', bookingRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

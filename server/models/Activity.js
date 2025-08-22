@@ -9,7 +9,7 @@ const activitySchema = new mongoose.Schema({
     action: {
         type: String,
         required: true,
-        enum: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT']
+        enum: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'SIGNUP', 'BOOKING']
     },
     resource: {
         type: String,

@@ -24,6 +24,26 @@ const propertySchema = new mongoose.Schema({
         trim: true,
         maxlength: 200
     },
+    // Amenities available at the property
+    amenities: {
+        ac: { type: Boolean, default: false },
+        wifi: { type: Boolean, default: false },
+        ro: { type: Boolean, default: false }, // RO Water
+        mess: { type: Boolean, default: false },
+        securityGuard: { type: Boolean, default: false },
+        maid: { type: Boolean, default: false },
+        parking: { type: Boolean, default: false },
+        laundry: { type: Boolean, default: false },
+        powerBackup: { type: Boolean, default: false },
+        cctv: { type: Boolean, default: false }
+    },
+    // Room types available
+    roomTypes: {
+        single: { type: Boolean, default: false },
+        double: { type: Boolean, default: false },
+        triple: { type: Boolean, default: false },
+        dormitory: { type: Boolean, default: false }
+    },
     pics: [{
         type: String,
         required: true,
@@ -60,6 +80,67 @@ const propertySchema = new mongoose.Schema({
             message: 'Invalid image URL format. Please provide a valid image URL (Google Drive, direct image link, or image hosting service).'
         }
     }],
+    // New photo structure
+    coverPhoto: {
+        type: String,
+        required: false, // Making it optional for backward compatibility, but will be required in frontend
+        validate: {
+            validator: function(url) {
+                if (!url || url.trim() === '') return true; // Allow empty for backward compatibility
+                if (typeof url !== 'string') return false;
+                
+                // Check if it's a valid HTTP/HTTPS URL
+                if (!/^https?:\/\/.+/.test(url)) return false;
+                
+                const validPatterns = [
+                    /drive\.google\.com/,
+                    /googleapis\.com/,
+                    /googleusercontent\.com/,
+                    /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i,
+                    /imgur\.com/,
+                    /cloudinary\.com/,
+                    /amazonaws\.com/,
+                    /unsplash\.com/,
+                    /pexels\.com/,
+                    /pixabay\.com/,
+                    /^https:\/\/.+\..+/
+                ];
+                
+                return validPatterns.some(pattern => pattern.test(url));
+            },
+            message: 'Invalid cover photo URL format.'
+        }
+    },
+    facilityPhotos: [{
+        type: String,
+        required: false,
+        validate: {
+            validator: function(url) {
+                if (!url || url.trim() === '') return true; // Allow empty strings
+                if (typeof url !== 'string') return false;
+                
+                // Check if it's a valid HTTP/HTTPS URL
+                if (!/^https?:\/\/.+/.test(url)) return false;
+                
+                const validPatterns = [
+                    /drive\.google\.com/,
+                    /googleapis\.com/,
+                    /googleusercontent\.com/,
+                    /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i,
+                    /imgur\.com/,
+                    /cloudinary\.com/,
+                    /amazonaws\.com/,
+                    /unsplash\.com/,
+                    /pexels\.com/,
+                    /pixabay\.com/,
+                    /^https:\/\/.+\..+/
+                ];
+                
+                return validPatterns.some(pattern => pattern.test(url));
+            },
+            message: 'Invalid facility photo URL format.'
+        }
+    }],
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -88,9 +169,47 @@ propertySchema.methods.getDirectImageUrls = function() {
     });
 };
 
-// Virtual field for direct image URLs
+// Helper method to get direct cover photo URL
+propertySchema.methods.getDirectCoverPhotoUrl = function() {
+    if (!this.coverPhoto) return null;
+    
+    if (this.coverPhoto.includes('drive.google.com/file/d/')) {
+        const fileId = this.coverPhoto.match(/\/d\/([a-zA-Z0-9-_]+)/);
+        if (fileId) {
+            return `https://drive.google.com/uc?export=view&id=${fileId[1]}`;
+        }
+    }
+    return this.coverPhoto;
+};
+
+// Helper method to get direct facility photo URLs
+propertySchema.methods.getDirectFacilityPhotoUrls = function() {
+    if (!this.facilityPhotos || this.facilityPhotos.length === 0) return [];
+    
+    return this.facilityPhotos.filter(pic => pic && pic.trim() !== '').map(pic => {
+        if (pic.includes('drive.google.com/file/d/')) {
+            const fileId = pic.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            if (fileId) {
+                return `https://drive.google.com/uc?export=view&id=${fileId[1]}`;
+            }
+        }
+        return pic;
+    });
+};
+
+// Virtual field for direct image URLs (legacy)
 propertySchema.virtual('directImageUrls').get(function() {
     return this.getDirectImageUrls();
+});
+
+// Virtual field for direct cover photo URL
+propertySchema.virtual('directCoverPhotoUrl').get(function() {
+    return this.getDirectCoverPhotoUrl();
+});
+
+// Virtual field for direct facility photo URLs
+propertySchema.virtual('directFacilityPhotoUrls').get(function() {
+    return this.getDirectFacilityPhotoUrls();
 });
 
 // Ensure virtual fields are serialized

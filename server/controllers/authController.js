@@ -6,6 +6,50 @@ const generateToken = (userId) => {
     return jwt.sign({ userId }, process.env.JWT_SECRET || 'your-secret-key', { expiresIn: '24h' });
 };
 
+const register = async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+
+        if (!username || !email || !password) {
+            return res.status(400).json({ message: 'Username, email, and password are required' });
+        }
+
+        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User with this email or username already exists' });
+        }
+
+        const user = new User({
+            username,
+            email,
+            password,
+            role: 'user' // Regular user role for signups
+        });
+
+        await user.save();
+
+        await logActivity(user._id, 'SIGNUP', 'USER', user._id.toString(), 
+            `New user registered: ${username} (${email})`, req.ip, req.get('User-Agent'));
+
+        const token = generateToken(user._id);
+
+        res.status(201).json({
+            message: 'Registration successful',
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                permissions: user.permissions
+            }
+        });
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -84,6 +128,7 @@ const getProfile = async (req, res) => {
 };
 
 module.exports = {
+    register,
     login,
     logout,
     getProfile

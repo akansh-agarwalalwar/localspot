@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['admin', 'subadmin'],
+        enum: ['admin', 'subadmin', 'user'],
         required: true
     },
     isActive: {
@@ -72,6 +72,13 @@ userSchema.pre('save', function(next) {
             canDelete: true
         };
     } else if (this.role === 'subadmin') {
+        this.permissions = {
+            canCreate: false,
+            canRead: true,
+            canUpdate: false,
+            canDelete: false
+        };
+    } else if (this.role === 'user') {
         this.permissions = {
             canCreate: false,
             canRead: true,

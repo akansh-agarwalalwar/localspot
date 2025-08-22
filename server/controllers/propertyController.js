@@ -1,15 +1,16 @@
 const Property = require('../models/Property');
 const { logActivity } = require('../utils/activityLogger');
+const { notifySubscribers } = require('../utils/notificationService');
 
 const createProperty = async (req, res) => {
     try {
-        const { title, description, price, location, pics } = req.body;
+        const { title, description, price, location, pics, coverPhoto, facilityPhotos, amenities, roomTypes } = req.body;
 
-        console.log('Received property data:', { title, description, price, location, pics });
+        console.log('Received property data:', { title, description, price, location, pics, coverPhoto, facilityPhotos, amenities, roomTypes });
 
-        if (!title || !description || !price || !location || !pics || pics.length === 0) {
+        if (!title || !description || !price || !location) {
             return res.status(400).json({ 
-                message: 'All fields are required (title, description, price, location, pics)' 
+                message: 'Basic fields are required (title, description, price, location)' 
             });
         }
 
@@ -17,44 +18,124 @@ const createProperty = async (req, res) => {
             return res.status(400).json({ message: 'Price must be greater than 0' });
         }
 
-        // Filter out empty pic URLs and normalize Google Drive URLs
-        const validPics = pics.filter(pic => pic && pic.trim() !== '').map(pic => {
-            const trimmedPic = pic.trim();
-            
-            // Convert Google Drive sharing URL to direct view URL if needed
-            if (trimmedPic.includes('drive.google.com/file/d/')) {
-                const fileIdMatch = trimmedPic.match(/\/d\/([a-zA-Z0-9-_]+)/);
-                if (fileIdMatch) {
-                    const convertedUrl = `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
-                    console.log(`Converting Google Drive URL: ${trimmedPic} -> ${convertedUrl}`);
-                    return convertedUrl;
-                }
-            }
-            
-            console.log(`Using original URL: ${trimmedPic}`);
-            return trimmedPic;
-        });
-
-        if (validPics.length === 0) {
-            return res.status(400).json({ message: 'At least one valid image URL is required' });
+        // Ensure we have either legacy pics or new photo structure
+        if ((!pics || pics.length === 0 || !pics.some(pic => pic && pic.trim() !== '')) && 
+            (!coverPhoto || coverPhoto.trim() === '')) {
+            return res.status(400).json({ 
+                message: 'At least one image is required (either legacy pics or cover photo)' 
+            });
         }
 
-        console.log('Processed image URLs:', validPics);
+        // Process legacy pics (for backward compatibility)
+        let validPics = [];
+        if (pics && pics.length > 0) {
+            validPics = pics.filter(pic => pic && pic.trim() !== '').map(pic => {
+                const trimmedPic = pic.trim();
+                
+                // Convert Google Drive sharing URL to direct view URL if needed
+                if (trimmedPic.includes('drive.google.com/file/d/')) {
+                    const fileIdMatch = trimmedPic.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                    if (fileIdMatch) {
+                        const convertedUrl = `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+                        console.log(`Converting Google Drive URL: ${trimmedPic} -> ${convertedUrl}`);
+                        return convertedUrl;
+                    }
+                }
+                
+                console.log(`Using original URL: ${trimmedPic}`);
+                return trimmedPic;
+            });
+        }
 
-        const property = new Property({
+        // Process cover photo
+        let processedCoverPhoto = '';
+        if (coverPhoto && coverPhoto.trim() !== '') {
+            const trimmedCoverPhoto = coverPhoto.trim();
+            if (trimmedCoverPhoto.includes('drive.google.com/file/d/')) {
+                const fileIdMatch = trimmedCoverPhoto.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                if (fileIdMatch) {
+                    processedCoverPhoto = `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+                    console.log(`Converting cover photo URL: ${trimmedCoverPhoto} -> ${processedCoverPhoto}`);
+                } else {
+                    processedCoverPhoto = trimmedCoverPhoto;
+                }
+            } else {
+                processedCoverPhoto = trimmedCoverPhoto;
+            }
+        }
+
+        // Process facility photos
+        let processedFacilityPhotos = [];
+        if (facilityPhotos && facilityPhotos.length > 0) {
+            processedFacilityPhotos = facilityPhotos.filter(pic => pic && pic.trim() !== '').map(pic => {
+                const trimmedPic = pic.trim();
+                
+                if (trimmedPic.includes('drive.google.com/file/d/')) {
+                    const fileIdMatch = trimmedPic.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                    if (fileIdMatch) {
+                        const convertedUrl = `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+                        console.log(`Converting facility photo URL: ${trimmedPic} -> ${convertedUrl}`);
+                        return convertedUrl;
+                    }
+                }
+                
+                return trimmedPic;
+            });
+        }
+
+        console.log('Processed image URLs:', { validPics, processedCoverPhoto, processedFacilityPhotos });
+
+        // Create property data - ensure legacy pics for backward compatibility
+        const propertyData = {
             title,
             description,
             price: Number(price),
             location,
-            pics: validPics,
+            pics: validPics.length > 0 ? validPics : [processedCoverPhoto || ''], // Fallback to cover photo if no legacy pics
+            amenities: amenities || {
+                ac: false,
+                wifi: false,
+                ro: false,
+                mess: false,
+                securityGuard: false,
+                maid: false,
+                parking: false,
+                laundry: false,
+                powerBackup: false,
+                cctv: false
+            },
+            roomTypes: roomTypes || {
+                single: false,
+                double: false,
+                triple: false,
+                dormitory: false
+            },
             createdBy: req.user._id
-        });
+        };
+
+        // Add new photo fields if provided
+        if (processedCoverPhoto) {
+            propertyData.coverPhoto = processedCoverPhoto;
+        }
+        if (processedFacilityPhotos.length > 0) {
+            propertyData.facilityPhotos = processedFacilityPhotos;
+        }
+
+        const property = new Property(propertyData);
 
         await property.save();
         await property.populate('createdBy', 'username email');
 
         await logActivity(req.user._id, 'CREATE', 'PROPERTY', property._id.toString(), 
             `Created property: ${title}`, req.ip, req.get('User-Agent'));
+
+        // Send notification to subscribers
+        const notificationResult = await notifySubscribers('pg', {
+            title: property.title,
+            price: property.price,
+            location: property.location,
+            description: property.description
+        });
 
         res.status(201).json({
             message: 'Property created successfully',
@@ -65,12 +146,19 @@ const createProperty = async (req, res) => {
                 price: property.price,
                 location: property.location,
                 pics: property.pics,
+                coverPhoto: property.coverPhoto,
+                facilityPhotos: property.facilityPhotos,
+                amenities: property.amenities,
+                roomTypes: property.roomTypes,
                 directImageUrls: property.directImageUrls,
+                directCoverPhotoUrl: property.directCoverPhotoUrl,
+                directFacilityPhotoUrls: property.directFacilityPhotoUrls,
                 createdBy: property.createdBy,
                 isActive: property.isActive,
                 createdAt: property.createdAt,
                 updatedAt: property.updatedAt
-            }
+            },
+            notification: notificationResult
         });
     } catch (error) {
         console.error('Create property error:', error);
@@ -123,13 +211,18 @@ const getAllProperties = async (req, res) => {
 
         const total = await Property.countDocuments(filter);
 
-        await logActivity(req.user._id, 'READ', 'PROPERTY', null, 
-            `Retrieved properties list (page ${page})`, req.ip, req.get('User-Agent'));
+        // Log activity only if user is authenticated
+        if (req.user && req.user._id) {
+            await logActivity(req.user._id, 'READ', 'PROPERTY', null, 
+                `Retrieved properties list (page ${page})`, req.ip, req.get('User-Agent'));
+        }
 
         res.json({
             properties: properties.map(property => ({
                 ...property.toObject(),
-                directImageUrls: property.directImageUrls // Include converted URLs
+                directImageUrls: property.directImageUrls, // Include converted URLs
+                directCoverPhotoUrl: property.directCoverPhotoUrl, // Include converted cover photo
+                directFacilityPhotoUrls: property.directFacilityPhotoUrls // Include converted facility photos
             })),
             pagination: {
                 page,
@@ -154,10 +247,20 @@ const getPropertyById = async (req, res) => {
             return res.status(404).json({ message: 'Property not found' });
         }
 
-        await logActivity(req.user._id, 'READ', 'PROPERTY', id, 
-            `Retrieved property: ${property.title}`, req.ip, req.get('User-Agent'));
+        // Log activity only if user is authenticated
+        if (req.user && req.user._id) {
+            await logActivity(req.user._id, 'READ', 'PROPERTY', id, 
+                `Retrieved property: ${property.title}`, req.ip, req.get('User-Agent'));
+        }
 
-        res.json({ property });
+        res.json({ 
+            property: {
+                ...property.toObject(),
+                directImageUrls: property.directImageUrls,
+                directCoverPhotoUrl: property.directCoverPhotoUrl,
+                directFacilityPhotoUrls: property.directFacilityPhotoUrls
+            }
+        });
     } catch (error) {
         console.error('Get property error:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -167,16 +270,24 @@ const getPropertyById = async (req, res) => {
 const updateProperty = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, price, location, pics, isActive } = req.body;
+        const { title, description, price, location, pics, coverPhoto, facilityPhotos, amenities, roomTypes, isActive } = req.body;
 
         const property = await Property.findById(id);
         if (!property) {
             return res.status(404).json({ message: 'Property not found' });
         }
 
-        // Check if user owns the property or is admin
-        if (property.createdBy.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Not authorized to update this property' });
+        // Permission logic:
+        // 1. Admin can update any property
+        // 2. Subadmin can update if they have canUpdate permission OR if they own the property
+        const isAdmin = req.user.role === 'admin';
+        const isOwner = property.createdBy.toString() === req.user._id.toString();
+        const hasUpdatePermission = req.user.permissions.canUpdate;
+        
+        if (!isAdmin && !isOwner && !hasUpdatePermission) {
+            return res.status(403).json({ 
+                message: 'You can only update properties you created or need update permission' 
+            });
         }
 
         if (title) property.title = title;
@@ -188,6 +299,14 @@ const updateProperty = async (req, res) => {
             property.price = Number(price);
         }
         if (location) property.location = location;
+        if (amenities) {
+            property.amenities = { ...property.amenities, ...amenities };
+        }
+        if (roomTypes) {
+            property.roomTypes = { ...property.roomTypes, ...roomTypes };
+        }
+        
+        // Handle legacy pics
         if (pics) {
             const validPics = pics.filter(pic => pic && pic.trim() !== '');
             if (validPics.length === 0) {
@@ -195,6 +314,22 @@ const updateProperty = async (req, res) => {
             }
             property.pics = validPics;
         }
+        
+        // Handle new cover photo
+        if (coverPhoto !== undefined) {
+            if (coverPhoto.trim() === '') {
+                property.coverPhoto = '';
+            } else {
+                property.coverPhoto = coverPhoto.trim();
+            }
+        }
+        
+        // Handle new facility photos
+        if (facilityPhotos !== undefined) {
+            const validFacilityPhotos = facilityPhotos.filter(pic => pic && pic.trim() !== '');
+            property.facilityPhotos = validFacilityPhotos;
+        }
+        
         if (typeof isActive === 'boolean') property.isActive = isActive;
 
         await property.save();
@@ -205,7 +340,12 @@ const updateProperty = async (req, res) => {
 
         res.json({
             message: 'Property updated successfully',
-            property
+            property: {
+                ...property.toObject(),
+                directImageUrls: property.directImageUrls,
+                directCoverPhotoUrl: property.directCoverPhotoUrl,
+                directFacilityPhotoUrls: property.directFacilityPhotoUrls
+            }
         });
     } catch (error) {
         console.error('Update property error:', error);
@@ -222,9 +362,17 @@ const deleteProperty = async (req, res) => {
             return res.status(404).json({ message: 'Property not found' });
         }
 
-        // Check if user owns the property or is admin
-        if (property.createdBy.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Not authorized to delete this property' });
+        // Permission logic:
+        // 1. Admin can delete any property
+        // 2. Subadmin can delete if they have canDelete permission OR if they own the property
+        const isAdmin = req.user.role === 'admin';
+        const isOwner = property.createdBy.toString() === req.user._id.toString();
+        const hasDeletePermission = req.user.permissions.canDelete;
+        
+        if (!isAdmin && !isOwner && !hasDeletePermission) {
+            return res.status(403).json({ 
+                message: 'You can only delete properties you created or need delete permission' 
+            });
         }
 
         await Property.findByIdAndDelete(id);
