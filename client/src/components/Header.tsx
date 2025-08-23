@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Bell, Phone, Menu, X } from "lucide-react";
+import { Search, Bell, Phone, Menu, X, Briefcase, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate, Link } from "react-router-dom";
@@ -13,6 +13,7 @@ const Header = () => {
     { label: "PG / Hostels", href: "/pg-hostels" },
     { label: "Mess / Cafe", href: "/mess-cafe" },
     { label: "Gaming Zone", href: "/gaming-zone" },
+    { label: "Paid GIG", href: "/paid-gig", isNew: true },
     { label: "About Us", href: "/about" },
     { label: "Contact", href: "/contact" },
   ];
@@ -94,13 +95,25 @@ const Header = () => {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.1 + index * 0.1 }}
                 >
-                  <Link
-                    to={item.href}
-                    className="text-foreground hover:text-primary transition-colors duration-300 relative group"
-                  >
-                    {item.label}
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-                  </Link>
+                  {item.label === "Paid GIG" ? (
+                    <Link
+                      to={item.href}
+                      className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                    >
+                      <Briefcase className="h-4 w-4" />
+                      <span className="font-medium">{item.label}</span>
+                      <Sparkles className="h-3 w-3 animate-pulse" />
+                      <span className="bg-yellow-400 text-purple-800 text-xs px-2 py-0.5 rounded-full font-bold">NEW</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      to={item.href}
+                      className="text-foreground hover:text-primary transition-colors duration-300 relative group"
+                    >
+                      {item.label}
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                  )}
                 </motion.div>
               ))}
               {/* Login/Signup Button */}
@@ -159,13 +172,26 @@ const Header = () => {
                   animate={{ x: isMenuOpen ? 0 : -20, opacity: isMenuOpen ? 1 : 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                 >
-                  <Link
-                    to={item.href}
-                    className="block py-2 px-4 text-foreground hover:text-primary hover:bg-muted rounded-lg transition-all duration-300"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
+                  {item.label === "Paid GIG" ? (
+                    <Link
+                      to={item.href}
+                      className="flex items-center gap-2 py-3 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Briefcase className="h-4 w-4" />
+                      <span className="font-medium">{item.label}</span>
+                      <Sparkles className="h-3 w-3 animate-pulse" />
+                      <span className="bg-yellow-400 text-purple-800 text-xs px-2 py-0.5 rounded-full font-bold ml-auto">NEW</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      to={item.href}
+                      className="block py-2 px-4 text-foreground hover:text-primary hover:bg-muted rounded-lg transition-all duration-300"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
                 </motion.div>
               ))}
               {/* Mobile Login/Signup Button */}

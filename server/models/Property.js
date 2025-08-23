@@ -44,6 +44,33 @@ const propertySchema = new mongoose.Schema({
         triple: { type: Boolean, default: false },
         dormitory: { type: Boolean, default: false }
     },
+    // Dormitory members information (only if dormitory is selected)
+    dormitoryMembers: [{
+        fullName: {
+            type: String,
+            required: function() { return this.roomTypes.dormitory; },
+            trim: true,
+            maxlength: 100
+        },
+        year: {
+            type: String,
+            required: function() { return this.roomTypes.dormitory; },
+            trim: true,
+            maxlength: 50
+        },
+        state: {
+            type: String,
+            required: function() { return this.roomTypes.dormitory; },
+            trim: true,
+            maxlength: 100
+        },
+        branch: {
+            type: String,
+            required: function() { return this.roomTypes.dormitory; },
+            trim: true,
+            maxlength: 100
+        }
+    }],
     pics: [{
         type: String,
         required: true,

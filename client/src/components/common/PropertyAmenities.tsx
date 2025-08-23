@@ -46,11 +46,16 @@ const PropertyAmenities: React.FC<PropertyAmenitiesProps> = ({
             {roomTypes.map((roomType) => (
               <span 
                 key={roomType.key}
-                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  roomType.key === 'dormitory' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                }`}
                 title={roomType.description}
               >
                 <span className="mr-1">{roomType.icon}</span>
                 {roomType.label}
+                {roomType.key === 'dormitory' && property.dormitoryMembers && property.dormitoryMembers.length > 0 && (
+                  <span className="ml-1 text-xs">({property.dormitoryMembers.length} residents)</span>
+                )}
               </span>
             ))}
           </div>
@@ -85,11 +90,22 @@ const PropertyAmenities: React.FC<PropertyAmenitiesProps> = ({
             {roomTypes.map((roomType) => (
               <div 
                 key={roomType.key}
-                className="flex flex-col items-center p-3 bg-blue-50 rounded-lg border border-blue-200"
+                className={`flex flex-col items-center p-3 rounded-lg border ${
+                  roomType.key === 'dormitory' ? 'bg-purple-50 border-purple-200' : 'bg-blue-50 border-blue-200'
+                }`}
                 title={roomType.description}
               >
                 <span className="text-2xl mb-1">{roomType.icon}</span>
-                <span className="text-sm font-medium text-blue-800">{roomType.label}</span>
+                <span className={`text-sm font-medium ${
+                  roomType.key === 'dormitory' ? 'text-purple-800' : 'text-blue-800'
+                }`}>
+                  {roomType.label}
+                </span>
+                {roomType.key === 'dormitory' && property.dormitoryMembers && property.dormitoryMembers.length > 0 && (
+                  <span className="text-xs text-purple-600 mt-1">
+                    {property.dormitoryMembers.length} current residents
+                  </span>
+                )}
               </div>
             ))}
           </div>

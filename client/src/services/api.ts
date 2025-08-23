@@ -5,7 +5,8 @@ import {
   ActivityFilters,
   PropertyFormData,
   MessFormData,
-  GamingZoneFormData
+  GamingZoneFormData,
+  GigWorkerFormData
 } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004/api';
@@ -116,6 +117,22 @@ export const gamingZoneAPI = {
   // Admin endpoints (require auth)
   getAllGamingZonesAdmin: (params = {}) => api.get('/gaming-zones', { params }),
   getGamingZoneByIdAdmin: (id: string) => api.get(`/gaming-zones/${id}`),
+};
+
+// GIG Worker API
+export const gigWorkerAPI = {
+  registerGigWorker: (data: GigWorkerFormData) => {
+    console.log('Sending gig worker data:', data);
+    return api.post('/gig-workers/register', data);
+  },
+  getAvailableWorkers: (params = {}) => api.get('/gig-workers/available', { params }),
+  // Admin endpoints (require auth)
+  getAllGigWorkers: (params = {}) => api.get('/gig-workers', { params }),
+  getGigWorkerById: (id: string) => api.get(`/gig-workers/${id}`),
+  updateGigWorkerStatus: (id: string, status: string) => api.patch(`/gig-workers/${id}/status`, { status }),
+  updateGigWorker: (id: string, data: Partial<GigWorkerFormData>) => api.put(`/gig-workers/${id}`, data),
+  deleteGigWorker: (id: string) => api.delete(`/gig-workers/${id}`),
+  getGigWorkerStats: () => api.get('/gig-workers/stats'),
 };
 
 export default api;

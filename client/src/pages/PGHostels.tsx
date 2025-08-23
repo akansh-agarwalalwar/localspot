@@ -790,7 +790,14 @@ const PGHostels = () => {
                       const availableRoomTypes = getAvailableRoomTypes(selectedProperty);
                       if (availableRoomTypes.length > 0) {
                         return availableRoomTypes.map((roomType) => (
-                          <SelectItem key={roomType.key} value={roomType.key} className="text-black hover:bg-gray-100">{roomType.label} Room - ₹{selectedProperty.price.toLocaleString()}</SelectItem>
+                          <SelectItem key={roomType.key} value={roomType.key} className="text-black hover:bg-gray-100">
+                            {roomType.label} Room - ₹{selectedProperty.price.toLocaleString()}
+                            {roomType.key === 'dormitory' && selectedProperty.dormitoryMembers && selectedProperty.dormitoryMembers.length > 0 && (
+                              <span className="text-xs text-purple-600 ml-2">
+                                ({selectedProperty.dormitoryMembers.length} current residents)
+                              </span>
+                            )}
+                          </SelectItem>
                         ));
                       }
                     }
@@ -803,6 +810,31 @@ const PGHostels = () => {
                 </SelectContent>
               </Select>
             </div>
+            
+            {/* Show dormitory member information if dormitory is selected */}
+            {bookingForm.roomType === 'dormitory' && selectedProperty && selectedProperty.dormitoryMembers && selectedProperty.dormitoryMembers.length > 0 && (
+              <div className="space-y-2 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                <Label className="text-purple-800 font-medium">Current Dormitory Residents</Label>
+                <div className="space-y-2">
+                  {selectedProperty.dormitoryMembers.map((member, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
+                      <div className="flex items-center gap-3">
+                        <Users className="h-4 w-4 text-purple-600" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{member.fullName}</p>
+                          <p className="text-xs text-gray-600">{member.year} • {member.branch}</p>
+                        </div>
+                      </div>
+                      <span className="text-xs text-gray-500">{member.state}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-purple-700">
+                  💡 You'll be sharing this accommodation with the residents listed above.
+                </p>
+              </div>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="date">Preferred Move-in Date</Label>
               <Input 

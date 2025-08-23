@@ -481,6 +481,45 @@ const PGDetails = () => {
                                       <div className="text-sm text-muted-foreground">per month</div>
                                     </div>
                                   </div>
+                                  
+                                  {/* Show dormitory members if it's a dormitory room and members exist */}
+                                  {roomType.key === 'dormitory' && property.dormitoryMembers && property.dormitoryMembers.length > 0 && (
+                                    <div className="mt-4 pt-4 border-t border-gray-200">
+                                      <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                                        <Users className="h-4 w-4" />
+                                        Current Residents ({property.dormitoryMembers.length})
+                                      </h4>
+                                      <div className="space-y-3">
+                                        {property.dormitoryMembers.map((member, index) => (
+                                          <div key={index} className="bg-gray-50 rounded-lg p-3">
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                              <div>
+                                                <span className="font-medium text-gray-700">Name:</span>
+                                                <p className="text-gray-900">{member.fullName}</p>
+                                              </div>
+                                              <div>
+                                                <span className="font-medium text-gray-700">Year:</span>
+                                                <p className="text-gray-900">{member.year}</p>
+                                              </div>
+                                              <div>
+                                                <span className="font-medium text-gray-700">State:</span>
+                                                <p className="text-gray-900">{member.state}</p>
+                                              </div>
+                                              <div>
+                                                <span className="font-medium text-gray-700">Branch:</span>
+                                                <p className="text-gray-900">{member.branch}</p>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                      <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                                        <p className="text-sm text-blue-800">
+                                          💡 <strong>Note:</strong> This is a shared accommodation. You'll be staying with the residents listed above.
+                                        </p>
+                                      </div>
+                                    </div>
+                                  )}
                                 </CardContent>
                               </Card>
                             ))}

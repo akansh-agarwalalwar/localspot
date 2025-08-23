@@ -18,6 +18,7 @@ import GamingZone from "./pages/GamingZone";
 import GamingZoneDetails from "./pages/GamingZoneDetails";
 import AboutUs from "./pages/AboutUs";
 import Contact from "./pages/Contact";
+import PaidGig from "./pages/PaidGig";
 import NotFound from "./pages/NotFound";
 import Debug from "./pages/Debug";
 
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/gaming-zone-details/:id" element={<GamingZoneDetails />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/paid-gig" element={<PaidGig />} />
             <Route path="/debug" element={<Debug />} />
 
             {/* Authentication Routes - PUBLIC */}

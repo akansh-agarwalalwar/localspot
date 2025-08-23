@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Property, PropertyFormData } from '../../types';
+import { Property, PropertyFormData, DormitoryMember } from '../../types';
 import { validateImageUrl, convertGoogleDriveUrl, getImagePreviewUrl } from '../../utils/imageUtils';
 import PropertyImage from '../common/PropertyImage';
 
@@ -36,6 +36,7 @@ const EditProperty: React.FC<EditPropertyProps> = ({ property, onUpdate, onClose
     pics: property.pics || [''],
     coverPhoto: property.coverPhoto || '',
     facilityPhotos: property.facilityPhotos || [''],
+    dormitoryMembers: property.dormitoryMembers || [],
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,6 +100,20 @@ const EditProperty: React.FC<EditPropertyProps> = ({ property, onUpdate, onClose
       }
     }
 
+    // Validate dormitory members if dormitory is selected
+    if (formData.roomTypes.dormitory) {
+      if (formData.dormitoryMembers.length === 0) {
+        errors.dormitoryMembers = 'At least one dormitory member is required when dormitory is selected';
+      } else {
+        const incompleteMembers = formData.dormitoryMembers.filter(member => 
+          !member.fullName.trim() || !member.year.trim() || !member.state.trim() || !member.branch.trim()
+        );
+        if (incompleteMembers.length > 0) {
+          errors.dormitoryMembers = 'Please fill in all details for each dormitory member';
+        }
+      }
+    }
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -129,13 +144,35 @@ const EditProperty: React.FC<EditPropertyProps> = ({ property, onUpdate, onClose
   };
 
   const handleRoomTypeChange = (roomType: keyof PropertyFormData['roomTypes']): void => {
-    setFormData(prev => ({
-      ...prev,
-      roomTypes: {
+    setFormData(prev => {
+      const newRoomTypes = {
         ...prev.roomTypes,
         [roomType]: !prev.roomTypes[roomType],
-      },
-    }));
+      };
+      
+      // If dormitory is being selected and there are no members, add one empty member
+      if (roomType === 'dormitory' && !prev.roomTypes.dormitory && prev.dormitoryMembers.length === 0) {
+        return {
+          ...prev,
+          roomTypes: newRoomTypes,
+          dormitoryMembers: [{ fullName: '', year: '', state: '', branch: '' }],
+        };
+      }
+      
+      // If dormitory is being deselected, clear members
+      if (roomType === 'dormitory' && prev.roomTypes.dormitory) {
+        return {
+          ...prev,
+          roomTypes: newRoomTypes,
+          dormitoryMembers: [],
+        };
+      }
+      
+      return {
+        ...prev,
+        roomTypes: newRoomTypes,
+      };
+    });
   };
 
   const handlePicChange = (index: number, value: string): void => {
@@ -214,6 +251,49 @@ const EditProperty: React.FC<EditPropertyProps> = ({ property, onUpdate, onClose
       setFormData(prev => ({
         ...prev,
         facilityPhotos: newFacilityPhotos,
+      }));
+    }
+  };
+
+  // Dormitory member handlers
+  const handleDormitoryMemberChange = (index: number, field: keyof DormitoryMember, value: string): void => {
+    const newMembers = [...formData.dormitoryMembers];
+    newMembers[index] = { ...newMembers[index], [field]: value };
+    setFormData(prev => ({
+      ...prev,
+      dormitoryMembers: newMembers,
+    }));
+    
+    // Clear validation error for dormitory members
+    if (validationErrors.dormitoryMembers) {
+      setValidationErrors(prev => ({
+        ...prev,
+        dormitoryMembers: '',
+      }));
+    }
+  };
+
+  const addDormitoryMember = (): void => {
+    setFormData(prev => ({
+      ...prev,
+      dormitoryMembers: [...prev.dormitoryMembers, { fullName: '', year: '', state: '', branch: '' }],
+    }));
+    
+    // Clear validation error for dormitory members
+    if (validationErrors.dormitoryMembers) {
+      setValidationErrors(prev => ({
+        ...prev,
+        dormitoryMembers: '',
+      }));
+    }
+  };
+
+  const removeDormitoryMember = (index: number): void => {
+    if (formData.dormitoryMembers.length > 0) {
+      const newMembers = formData.dormitoryMembers.filter((_, i) => i !== index);
+      setFormData(prev => ({
+        ...prev,
+        dormitoryMembers: newMembers,
       }));
     }
   };
@@ -455,6 +535,135 @@ const EditProperty: React.FC<EditPropertyProps> = ({ property, onUpdate, onClose
                 ))}
               </div>
             </div>
+
+            {/* Dormitory Section - Only show if dormitory is selected */}
+            {formData.roomTypes.dormitory && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+                    Dormitory Members <span className="text-sm font-normal text-gray-500">(Current residents)</span>
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={addDormitoryMember}
+                    disabled={isSubmitting}
+                    className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors"
+                  >
+                    Add Member
+                  </button>
+                </div>
+
+                <div className="bg-green-50 border border-green-200 rounded-md p-3">
+                  <p className="text-sm text-green-800">
+                    🏠 <strong>Dormitory Information:</strong>
+                  </p>
+                  <ul className="text-sm text-green-700 mt-2 ml-4 list-disc">
+                    <li>Add details of current members staying in the dormitory</li>
+                    <li>This helps potential residents know who they'll be sharing with</li>
+                    <li>Include full name, academic year, home state, and branch of study</li>
+                  </ul>
+                </div>
+
+                {formData.dormitoryMembers.length === 0 ? (
+                  <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+                    <p className="text-gray-500 mb-3">No dormitory members added yet</p>
+                    <button
+                      type="button"
+                      onClick={addDormitoryMember}
+                      disabled={isSubmitting}
+                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                    >
+                      Add First Member
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {formData.dormitoryMembers.map((member, index) => (
+                      <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-medium text-gray-900">Member {index + 1}</h4>
+                          <button
+                            type="button"
+                            onClick={() => removeDormitoryMember(index)}
+                            disabled={isSubmitting}
+                            className="text-red-600 hover:bg-red-50 px-2 py-1 rounded transition-colors"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Full Name *
+                            </label>
+                            <input
+                              type="text"
+                              value={member.fullName}
+                              onChange={(e) => handleDormitoryMemberChange(index, 'fullName', e.target.value)}
+                              disabled={isSubmitting}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                              placeholder="Enter full name"
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Academic Year *
+                            </label>
+                            <select
+                              value={member.year}
+                              onChange={(e) => handleDormitoryMemberChange(index, 'year', e.target.value)}
+                              disabled={isSubmitting}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            >
+                              <option value="">Select year</option>
+                              <option value="1st Year">1st Year</option>
+                              <option value="2nd Year">2nd Year</option>
+                              <option value="3rd Year">3rd Year</option>
+                              <option value="4th Year">4th Year</option>
+                              <option value="Final Year">Final Year</option>
+                              <option value="Post Graduate">Post Graduate</option>
+                            </select>
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Home State *
+                            </label>
+                            <input
+                              type="text"
+                              value={member.state}
+                              onChange={(e) => handleDormitoryMemberChange(index, 'state', e.target.value)}
+                              disabled={isSubmitting}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                              placeholder="e.g., Delhi, Punjab, Maharashtra"
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Branch of Study *
+                            </label>
+                            <input
+                              type="text"
+                              value={member.branch}
+                              onChange={(e) => handleDormitoryMemberChange(index, 'branch', e.target.value)}
+                              disabled={isSubmitting}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                              placeholder="e.g., Computer Science, Mechanical, ECE"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {validationErrors.dormitoryMembers && (
+              <p className="text-sm text-red-600">{validationErrors.dormitoryMembers}</p>
+            )}
 
             {/* Cover Photo Section */}
             <div className="space-y-4">

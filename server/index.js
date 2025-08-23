@@ -12,6 +12,7 @@ const messRoutes = require('./routes/mess');
 const gamingZoneRoutes = require('./routes/gamingZone');
 const subscriptionRoutes = require('./routes/subscription');
 const bookingRoutes = require('./routes/booking');
+const gigWorkerRoutes = require('./routes/gigWorker');
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.use('/api/messes', messRoutes);
 app.use('/api/gaming-zones', gamingZoneRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/booking', bookingRoutes);
+app.use('/api/gig-workers', gigWorkerRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

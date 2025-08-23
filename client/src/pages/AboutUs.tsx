@@ -73,14 +73,14 @@ const AboutUs = () => {
       image: "/vansh.jpeg"
     },
     {
-      name: "Swayam Sharma", 
-      role: "Head of Operations",
+      name: "Swayam Gupta", 
+      role: "Co-founder & Marketing Head",
       description: "Operations mastermind ensuring excellence at every touchpoint. Specializes in scaling platforms while maintaining the highest quality standards.",
       image: "/swayam.jpeg"
     },
     {
-      name: "Sonu Kumar",
-      role: "Head of Technology", 
+      name: "Sonu Prajapati",
+      role: "Co-founder & Product Manager", 
       description: "Tech architect building the future of property discovery. Creates robust, intuitive platforms that make finding accommodation effortless and secure.",
       image: "/sonu.jpeg"
     }

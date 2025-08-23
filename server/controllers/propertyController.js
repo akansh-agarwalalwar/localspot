@@ -4,9 +4,9 @@ const { notifySubscribers } = require('../utils/notificationService');
 
 const createProperty = async (req, res) => {
     try {
-        const { title, description, price, location, pics, coverPhoto, facilityPhotos, amenities, roomTypes } = req.body;
+        const { title, description, price, location, pics, coverPhoto, facilityPhotos, amenities, roomTypes, dormitoryMembers } = req.body;
 
-        console.log('Received property data:', { title, description, price, location, pics, coverPhoto, facilityPhotos, amenities, roomTypes });
+        console.log('Received property data:', { title, description, price, location, pics, coverPhoto, facilityPhotos, amenities, roomTypes, dormitoryMembers });
 
         if (!title || !description || !price || !location) {
             return res.status(400).json({ 
@@ -16,6 +16,24 @@ const createProperty = async (req, res) => {
 
         if (price <= 0) {
             return res.status(400).json({ message: 'Price must be greater than 0' });
+        }
+
+        // Validate dormitory members if dormitory room type is selected
+        if (roomTypes && roomTypes.dormitory) {
+            if (!dormitoryMembers || dormitoryMembers.length === 0) {
+                return res.status(400).json({ 
+                    message: 'At least one dormitory member is required when dormitory room type is selected' 
+                });
+            }
+            
+            // Validate each dormitory member
+            for (const member of dormitoryMembers) {
+                if (!member.fullName || !member.year || !member.state || !member.branch) {
+                    return res.status(400).json({ 
+                        message: 'All dormitory member fields (fullName, year, state, branch) are required' 
+                    });
+                }
+            }
         }
 
         // Ensure we have either legacy pics or new photo structure
@@ -113,6 +131,11 @@ const createProperty = async (req, res) => {
             createdBy: req.user._id
         };
 
+        // Add dormitory members if provided and dormitory is selected
+        if (roomTypes && roomTypes.dormitory && dormitoryMembers && dormitoryMembers.length > 0) {
+            propertyData.dormitoryMembers = dormitoryMembers;
+        }
+
         // Add new photo fields if provided
         if (processedCoverPhoto) {
             propertyData.coverPhoto = processedCoverPhoto;
@@ -150,6 +173,7 @@ const createProperty = async (req, res) => {
                 facilityPhotos: property.facilityPhotos,
                 amenities: property.amenities,
                 roomTypes: property.roomTypes,
+                dormitoryMembers: property.dormitoryMembers,
                 directImageUrls: property.directImageUrls,
                 directCoverPhotoUrl: property.directCoverPhotoUrl,
                 directFacilityPhotoUrls: property.directFacilityPhotoUrls,
@@ -294,7 +318,7 @@ const getPropertyById = async (req, res) => {
 const updateProperty = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, price, location, pics, coverPhoto, facilityPhotos, amenities, roomTypes, isActive } = req.body;
+        const { title, description, price, location, pics, coverPhoto, facilityPhotos, amenities, roomTypes, dormitoryMembers, isActive } = req.body;
 
         const property = await Property.findById(id);
         if (!property) {
@@ -371,6 +395,34 @@ const updateProperty = async (req, res) => {
         }
         if (roomTypes) {
             property.roomTypes = { ...property.roomTypes, ...roomTypes };
+            
+            // Validate dormitory members if dormitory is being set to true
+            if (roomTypes.dormitory) {
+                if (!dormitoryMembers || dormitoryMembers.length === 0) {
+                    return res.status(400).json({ 
+                        message: 'At least one dormitory member is required when dormitory room type is selected' 
+                    });
+                }
+                
+                // Validate each dormitory member
+                for (const member of dormitoryMembers) {
+                    if (!member.fullName || !member.year || !member.state || !member.branch) {
+                        return res.status(400).json({ 
+                            message: 'All dormitory member fields (fullName, year, state, branch) are required' 
+                        });
+                    }
+                }
+            }
+        }
+        
+        // Handle dormitory members
+        if (dormitoryMembers !== undefined) {
+            if (property.roomTypes.dormitory && dormitoryMembers.length === 0) {
+                return res.status(400).json({ 
+                    message: 'Cannot remove all dormitory members when dormitory room type is active' 
+                });
+            }
+            property.dormitoryMembers = dormitoryMembers;
         }
         
         // Handle legacy pics

@@ -80,6 +80,13 @@ export interface ActivityFilters {
   endDate?: string;
 }
 
+export interface DormitoryMember {
+  fullName: string;
+  year: string;
+  state: string;
+  branch: string;
+}
+
 export interface Property {
   _id: string;
   title: string;
@@ -107,6 +114,7 @@ export interface Property {
   pics: string[]; // Array of Google Drive links
   coverPhoto?: string; // Single cover photo URL
   facilityPhotos?: string[]; // Array of facility/interior photos
+  dormitoryMembers?: DormitoryMember[]; // Members staying in dormitory
   createdBy: string | User;
   isActive: boolean;
   createdAt: string;
@@ -139,6 +147,7 @@ export interface PropertyFormData {
   pics: string[];
   coverPhoto: string; // Single cover photo URL (required)
   facilityPhotos: string[]; // Array of facility/interior photos
+  dormitoryMembers: DormitoryMember[]; // Members staying in dormitory
 }
 
 export interface Mess {
@@ -241,6 +250,17 @@ export interface GamingZone {
   updatedAt: string;
   directImageUrls?: string[];
   directCoverPhotoUrl?: string;
+}
+
+export interface GigWorkerFormData {
+  fullName: string;
+  email: string;
+  mobile: string;
+  year: string;
+  branch: string;
+  skills: string[];
+  experience: string;
+  hourlyRate: string;
 }
 
 export interface GamingZoneFormData {
