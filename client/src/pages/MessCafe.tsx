@@ -305,19 +305,19 @@ Please provide more details about pricing and availability.`;
               <div className="grid md:grid-cols-3 gap-4">
                 <Input 
                   placeholder="Search location..." 
-                  className="bg-white" 
+                  className="bg-white text-black placeholder:text-gray-500" 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <Select>
-                  <SelectTrigger className="bg-white">
+                  <SelectTrigger className="bg-white text-black">
                     <SelectValue placeholder="Meal Type" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="breakfast">Breakfast</SelectItem>
-                    <SelectItem value="lunch">Lunch</SelectItem>
-                    <SelectItem value="dinner">Dinner</SelectItem>
-                    <SelectItem value="snacks">Snacks</SelectItem>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="breakfast" className="text-black hover:bg-gray-100">Breakfast</SelectItem>
+                    <SelectItem value="lunch" className="text-black hover:bg-gray-100">Lunch</SelectItem>
+                    <SelectItem value="dinner" className="text-black hover:bg-gray-100">Dinner</SelectItem>
+                    <SelectItem value="snacks" className="text-black hover:bg-gray-100">Snacks</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button className="bg-gradient-primary hover:opacity-90">
@@ -439,13 +439,13 @@ Please provide more details about pricing and availability.`;
                   Filters
                 </Button>
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-48">
+                  <SelectTrigger className="w-48 text-black">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="price-low">Price: Low to High</SelectItem>
-                    <SelectItem value="price-high">Price: High to Low</SelectItem>
-                    <SelectItem value="newest">Newest First</SelectItem>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="price-low" className="text-black hover:bg-gray-100">Price: Low to High</SelectItem>
+                    <SelectItem value="price-high" className="text-black hover:bg-gray-100">Price: High to Low</SelectItem>
+                    <SelectItem value="newest" className="text-black hover:bg-gray-100">Newest First</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -738,6 +738,7 @@ Please provide more details about pricing and availability.`;
                 placeholder="Enter your full name" 
                 value={bookingForm.name}
                 onChange={(e) => handleFormChange('name', e.target.value)}
+                className="text-black placeholder:text-gray-500"
               />
             </div>
             <div className="space-y-2">
@@ -747,6 +748,7 @@ Please provide more details about pricing and availability.`;
                 placeholder="Enter your mobile number" 
                 value={bookingForm.mobile}
                 onChange={(e) => handleFormChange('mobile', e.target.value)}
+                className="text-black placeholder:text-gray-500"
               />
             </div>
             <div className="space-y-2">
@@ -757,34 +759,35 @@ Please provide more details about pricing and availability.`;
                 placeholder="Enter your email address" 
                 value={bookingForm.email}
                 onChange={(e) => handleFormChange('email', e.target.value)}
+                className="text-black placeholder:text-gray-500"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="meal-type">Meal Preference</Label>
               <Select value={bookingForm.mealType} onValueChange={(value) => handleFormChange('mealType', value)}>
-                <SelectTrigger>
+                <SelectTrigger className="text-black">
                   <SelectValue placeholder="Select meal type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   {selectedMess && (
                     <>
                       {selectedMess.timings.breakfast.available && (
-                        <SelectItem value="breakfast">
+                        <SelectItem value="breakfast" className="text-black hover:bg-gray-100">
                           Breakfast ({selectedMess.timings.breakfast.time}) - ₹{selectedMess.pricing.breakfast}
                         </SelectItem>
                       )}
                       {selectedMess.timings.lunch.available && (
-                        <SelectItem value="lunch">
+                        <SelectItem value="lunch" className="text-black hover:bg-gray-100">
                           Lunch ({selectedMess.timings.lunch.time}) - ₹{selectedMess.pricing.lunch}
                         </SelectItem>
                       )}
                       {selectedMess.timings.dinner.available && (
-                        <SelectItem value="dinner">
+                        <SelectItem value="dinner" className="text-black hover:bg-gray-100">
                           Dinner ({selectedMess.timings.dinner.time}) - ₹{selectedMess.pricing.dinner}
                         </SelectItem>
                       )}
                       {selectedMess.timings.snacks.available && (
-                        <SelectItem value="snacks">
+                        <SelectItem value="snacks" className="text-black hover:bg-gray-100">
                           Snacks ({selectedMess.timings.snacks.time}) - ₹{selectedMess.pricing.snacks}
                         </SelectItem>
                       )}
@@ -800,6 +803,7 @@ Please provide more details about pricing and availability.`;
                 type="date" 
                 value={bookingForm.startDate}
                 onChange={(e) => handleFormChange('startDate', e.target.value)}
+                className="text-black"
               />
             </div>
             <div className="space-y-2">
@@ -809,6 +813,7 @@ Please provide more details about pricing and availability.`;
                 placeholder="Any dietary requirements or special requests..." 
                 value={bookingForm.message}
                 onChange={(e) => handleFormChange('message', e.target.value)}
+                className="text-black placeholder:text-gray-500"
               />
             </div>
             <Button 

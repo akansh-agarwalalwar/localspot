@@ -17,7 +17,7 @@ const Contact = () => {
     {
       icon: Phone,
       title: "Phone Support",
-      details: ["+91 98765 43210", "+91 98765 43211"],
+      details: ["+91 8852019731", "+91 8852019731"],
       description: "Call us for immediate assistance",
       available: "24/7"
     },
@@ -31,7 +31,7 @@ const Contact = () => {
     {
       icon: MessageCircle,
       title: "WhatsApp Support",
-      details: ["+91 98765 43210"],
+      details: ["+91 8852019731"],
       description: "Quick support via WhatsApp",
       available: "24/7"
     }
@@ -197,11 +197,19 @@ const Contact = () => {
                 Need immediate assistance? Our emergency support team is available 24/7 for urgent matters.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+                <Button 
+                  size="lg" 
+                  className="bg-white text-primary hover:bg-white/90"
+                  onClick={() => window.open('tel:+918852019731', '_self')}
+                >
                   <Phone className="h-4 w-4 mr-2" />
-                  Call +91 98765 43210
+                  Call +91 8852019731
                 </Button>
-                <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+                <Button 
+                  size="lg" 
+                  className="bg-white text-primary hover:bg-white/90"
+                  onClick={() => window.open('https://wa.me/918852019731?text=Hello! I need emergency support assistance.', '_blank')}
+                >
                   <MessageCircle className="h-4 w-4 mr-2" />
                   WhatsApp Support
                 </Button>

@@ -215,3 +215,50 @@ export interface MessFormData {
     snacks: number;
   };
 }
+
+export interface GamingZone {
+  _id: string;
+  title: string;
+  description: string;
+  location: string;
+  monthlyPrice: number;
+  hourlyPrice: number;
+  images: string[];
+  coverPhoto: string;
+  amenities: {
+    ac: boolean;
+    gamingConsole: boolean;
+    ps5: boolean;
+    xbox: boolean;
+    wifi: boolean;
+    parking: boolean;
+    powerBackup: boolean;
+    cctv: boolean;
+  };
+  createdBy: string | User;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  directImageUrls?: string[];
+  directCoverPhotoUrl?: string;
+}
+
+export interface GamingZoneFormData {
+  title: string;
+  description: string;
+  location: string;
+  monthlyPrice: number;
+  hourlyPrice: number;
+  images: string[];
+  coverPhoto: string;
+  amenities: {
+    ac: boolean;
+    gamingConsole: boolean;
+    ps5: boolean;
+    xbox: boolean;
+    wifi: boolean;
+    parking: boolean;
+    powerBackup: boolean;
+    cctv: boolean;
+  };
+}

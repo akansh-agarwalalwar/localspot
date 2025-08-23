@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Users, Send, Bell } from 'lucide-react';
-import { API_BASE_URL } from '@/services/api';
 
 interface Subscription {
   _id: string;
@@ -46,7 +45,7 @@ const SubscriptionManager: React.FC = () => {
   const fetchSubscriptions = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/subscription/all`, {
+      const response = await fetch('http://localhost:5004/api/subscription/all', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

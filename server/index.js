@@ -9,6 +9,7 @@ const activityRoutes = require('./routes/activity');
 const setupRoutes = require('./routes/setup');
 const propertyRoutes = require('./routes/property');
 const messRoutes = require('./routes/mess');
+const gamingZoneRoutes = require('./routes/gamingZone');
 const subscriptionRoutes = require('./routes/subscription');
 const bookingRoutes = require('./routes/booking');
 
@@ -18,15 +19,12 @@ const app = express();
 const PORT = process.env.PORT || 5004;
 
 // Middleware
-app.use(cors({
-    origin: '*', // Allow all origins
-    credentials: false // Set to false when using origin: '*'
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/localspot', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
@@ -41,6 +39,7 @@ app.use('/api/activity', activityRoutes);
 app.use('/api/setup', setupRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/messes', messRoutes);
+app.use('/api/gaming-zones', gamingZoneRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/booking', bookingRoutes);
 

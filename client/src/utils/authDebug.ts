@@ -41,7 +41,7 @@ function clearAuth() {
 // 3. Test API connection
 async function testAPI() {
     try {
-        const response = await fetch('https://localspot-spq8.onrender.com/api/auth/profile', {
+        const response = await fetch('http://localhost:5004/api/auth/profile', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,

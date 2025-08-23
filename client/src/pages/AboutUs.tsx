@@ -4,11 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const AboutUs = () => {
   const timelineRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   // Ensure page starts from top when component mounts
   useEffect(() => {
@@ -65,22 +67,22 @@ const AboutUs = () => {
 
   const team = [
     {
-      name: "Rajesh Kumar",
+      name: "Vansh Agarwal",
       role: "Founder & CEO",
-      description: "10+ years in hospitality and tech. Passionate about solving accommodation challenges for students and professionals.",
-      image: "/api/placeholder/150/150"
+      description: "Visionary entrepreneur driving innovation in student accommodation. Passionate about creating seamless experiences that connect students with their perfect living spaces.",
+      image: "/vansh.jpeg"
     },
     {
-      name: "Priya Sharma", 
+      name: "Swayam Sharma", 
       role: "Head of Operations",
-      description: "Expert in scaling service platforms. Ensures quality and consistency across all our partner properties.",
-      image: "/api/placeholder/150/150"
+      description: "Operations mastermind ensuring excellence at every touchpoint. Specializes in scaling platforms while maintaining the highest quality standards.",
+      image: "/swayam.jpeg"
     },
     {
-      name: "Arjun Reddy",
+      name: "Sonu Kumar",
       role: "Head of Technology", 
-      description: "Building robust, user-friendly platforms. Focuses on making booking experiences seamless and secure.",
-      image: "/api/placeholder/150/150"
+      description: "Tech architect building the future of property discovery. Creates robust, intuitive platforms that make finding accommodation effortless and secure.",
+      image: "/sonu.jpeg"
     }
   ];
 
@@ -383,16 +385,16 @@ const AboutUs = () => {
           transition={{ duration: 0.8 }}
           className="mb-20"
         >
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">
-              Meet Our <span className="bg-gradient-hero bg-clip-text text-transparent">Team</span>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Meet Our <span className="bg-gradient-hero bg-clip-text text-transparent">Dream Team</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Passionate individuals working to make your accommodation search effortless
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              The passionate minds behind LocalSpot, working tirelessly to revolutionize how students find their perfect accommodation
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-10">
             {team.map((member, index) => (
               <motion.div
                 key={index}
@@ -400,18 +402,40 @@ const AboutUs = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
-                whileHover={{ y: -5 }}
+                whileHover={{ y: -8 }}
               >
-                <Card className="border-0 shadow-medium hover:shadow-large transition-all duration-300 text-center">
+                <Card className="border-0 shadow-medium hover:shadow-xl transition-all duration-300 text-center group h-full">
                   <CardContent className="p-8">
-                    <div className="w-24 h-24 bg-gradient-primary rounded-full mx-auto mb-4 flex items-center justify-center">
-                      <span className="text-2xl font-bold text-white">
-                        {member.name.split(' ').map(n => n[0]).join('')}
-                      </span>
+                    <div className="w-36 h-36 rounded-full mx-auto mb-6 overflow-hidden border-4 border-primary/20 shadow-xl group-hover:border-primary/40 transition-all duration-300 bg-gradient-to-br from-primary/5 to-secondary/5">
+                      <img 
+                        src={member.image} 
+                        alt={member.name}
+                        className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500 ease-out"
+                        style={{
+                          objectPosition: 'center center',
+                          filter: 'brightness(1.05) contrast(1.1) saturate(1.1)'
+                        }}
+                        onError={(e) => {
+                          // Fallback to gradient circle with initials if image fails to load
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                      {/* Fallback gradient circle (hidden by default) */}
+                      <div 
+                        className="w-36 h-36 bg-gradient-primary rounded-full flex items-center justify-center"
+                        style={{ display: 'none' }}
+                      >
+                        <span className="text-3xl font-bold text-white">
+                          {member.name.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
                     </div>
-                    <h3 className="text-xl font-bold mb-2">{member.name}</h3>
-                    <Badge variant="secondary" className="mb-4">{member.role}</Badge>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
+                    <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors duration-300">{member.name}</h3>
+                    <Badge variant="outline" className="mb-4 bg-primary/10 text-primary border-primary/30 font-semibold">{member.role}</Badge>
+                    <p className="text-muted-foreground text-sm leading-relaxed max-w-sm mx-auto">
                       {member.description}
                     </p>
                   </CardContent>
@@ -438,10 +462,18 @@ const AboutUs = () => {
                 Join thousands of satisfied customers who found their ideal accommodation through PgNearU
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+                <Button 
+                  size="lg" 
+                  className="bg-white text-primary hover:bg-white/90"
+                  onClick={() => navigate('/')}
+                >
                   Start Your Search
                 </Button>
-                <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+                <Button 
+                  size="lg" 
+                  className="bg-white text-primary hover:bg-white/90"
+                  onClick={() => navigate('/pg-hostels')}
+                >
                   List Your Property
                 </Button>
               </div>

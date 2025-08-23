@@ -15,6 +15,7 @@ import PGDetails from "./pages/PGDetails";
 import MessCafe from "./pages/MessCafe";
 import MessDetails from "./pages/MessDetails";
 import GamingZone from "./pages/GamingZone";
+import GamingZoneDetails from "./pages/GamingZoneDetails";
 import AboutUs from "./pages/AboutUs";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/mess-cafe" element={<MessCafe />} />
             <Route path="/mess-details/:id" element={<MessDetails />} />
             <Route path="/gaming-zone" element={<GamingZone />} />
+            <Route path="/gaming-zone-details/:id" element={<GamingZoneDetails />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/debug" element={<Debug />} />

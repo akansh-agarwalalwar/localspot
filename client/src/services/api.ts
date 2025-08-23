@@ -4,10 +4,11 @@ import {
   SubadminFormData, 
   ActivityFilters,
   PropertyFormData,
-  MessFormData
+  MessFormData,
+  GamingZoneFormData
 } from '../types';
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004/api';
 
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -100,6 +101,21 @@ export const messAPI = {
   // Admin endpoints (require auth)
   getAllMessesAdmin: (params = {}) => api.get('/messes', { params }),
   getMessByIdAdmin: (id: string) => api.get(`/messes/${id}`),
+};
+
+// Gaming Zone API
+export const gamingZoneAPI = {
+  createGamingZone: (data: GamingZoneFormData) => {
+    console.log('Sending gaming zone data:', data);
+    return api.post('/gaming-zones', data);
+  },
+  getAllGamingZones: (params = {}) => api.get('/gaming-zones/public', { params }), // Use public endpoint
+  getGamingZoneById: (id: string) => api.get(`/gaming-zones/public/${id}`), // Use public endpoint
+  updateGamingZone: (id: string, data: Partial<GamingZoneFormData>) => api.put(`/gaming-zones/${id}`, data),
+  deleteGamingZone: (id: string) => api.delete(`/gaming-zones/${id}`),
+  // Admin endpoints (require auth)
+  getAllGamingZonesAdmin: (params = {}) => api.get('/gaming-zones', { params }),
+  getGamingZoneByIdAdmin: (id: string) => api.get(`/gaming-zones/${id}`),
 };
 
 export default api;

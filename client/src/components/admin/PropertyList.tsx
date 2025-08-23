@@ -265,8 +265,9 @@ const PropertyList: React.FC<PropertyListProps> = ({
             </div>
 
             {/* Pagination */}
-            <div className="bg-gray-50 px-6 py-3 border-t">
-              <div className="flex items-center justify-between">
+                        {/* Pagination - only show if there are multiple pages */}
+            {pagination.pages > 1 && (
+              <div className="mt-8 flex items-center justify-between bg-white px-4 py-3 border-t border-gray-200">
                 <div className="flex items-center text-sm text-gray-500">
                   <span>
                     Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
@@ -294,7 +295,7 @@ const PropertyList: React.FC<PropertyListProps> = ({
                   </button>
                 </div>
               </div>
-            </div>
+            )}
           </>
         )}
       </div>

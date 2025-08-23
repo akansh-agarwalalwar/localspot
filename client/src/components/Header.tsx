@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Search, Bell, Phone, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -81,25 +81,41 @@ const Header = () => {
               <Search className="h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by location, category..."
-                className="border-0 bg-transparent placeholder:text-muted-foreground focus-visible:ring-0"
+                className="border-0 bg-transparent text-black placeholder:text-muted-foreground focus-visible:ring-0"
               />
             </div>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-6">
               {navItems.map((item, index) => (
-                <motion.a
+                <motion.div
                   key={item.label}
-                  href={item.href}
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.1 + index * 0.1 }}
-                  className="text-foreground hover:text-primary transition-colors duration-300 relative group"
                 >
-                  {item.label}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-                </motion.a>
+                  <Link
+                    to={item.href}
+                    className="text-foreground hover:text-primary transition-colors duration-300 relative group"
+                  >
+                    {item.label}
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                </motion.div>
               ))}
+              {/* Login/Signup Button */}
+              <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.1 + navItems.length * 0.1 }}
+              >
+                <Button
+                  onClick={() => navigate('/login')}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-full transition-all duration-300 hover:scale-105"
+                >
+                  Login / Signup
+                </Button>
+              </motion.div>
             </div>
 
             {/* Mobile Menu Button */}
@@ -123,7 +139,7 @@ const Header = () => {
               <Search className="h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by location, category..."
-                className="border-0 bg-transparent placeholder:text-muted-foreground focus-visible:ring-0"
+                className="border-0 bg-transparent text-black placeholder:text-muted-foreground focus-visible:ring-0"
               />
             </div>
           </motion.div>
@@ -137,18 +153,38 @@ const Header = () => {
           >
             <div className="py-4 space-y-2">
               {navItems.map((item, index) => (
-                <motion.a
+                <motion.div
                   key={item.label}
-                  href={item.href}
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: isMenuOpen ? 0 : -20, opacity: isMenuOpen ? 1 : 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="block py-2 px-4 text-foreground hover:text-primary hover:bg-muted rounded-lg transition-all duration-300"
-                  onClick={() => setIsMenuOpen(false)}
                 >
-                  {item.label}
-                </motion.a>
+                  <Link
+                    to={item.href}
+                    className="block py-2 px-4 text-foreground hover:text-primary hover:bg-muted rounded-lg transition-all duration-300"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                </motion.div>
               ))}
+              {/* Mobile Login/Signup Button */}
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: isMenuOpen ? 0 : -20, opacity: isMenuOpen ? 1 : 0 }}
+                transition={{ duration: 0.3, delay: navItems.length * 0.1 }}
+                className="pt-2"
+              >
+                <Button
+                  onClick={() => {
+                    navigate('/login');
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-2 rounded-lg transition-all duration-300"
+                >
+                  Login / Signup
+                </Button>
+              </motion.div>
             </div>
           </motion.div>
         </div>

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { API_BASE_URL } from "@/services/api";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -37,7 +37,7 @@ const Footer = () => {
     setIsSubscribing(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/subscription/subscribe`, {
+      const response = await fetch('http://localhost:5004/api/subscription/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,19 +75,18 @@ const Footer = () => {
     {
       title: "Quick Links",
       links: [
-        { label: "PG & Hostels", href: "#pg-hostels" },
-        { label: "Mess & Cafes", href: "#mess-cafe" },
-        { label: "Gaming Zones", href: "#gaming-zone" },
-        { label: "Rooms & Flats", href: "#rooms-flats" },
-        { label: "About Us", href: "#about" },
+        { label: "PG & Flats", href: "/pg-hostels" },
+        { label: "Mess & Cafes", href: "/mess-cafe" },
+        { label: "Gaming Zones", href: "/gaming-zone" },
+        { label: "About Us", href: "/about" },
       ],
     },
     {
       title: "Support",
       links: [
-        { label: "Help Center", href: "#help" },
-        { label: "Contact Us", href: "#contact" },
-        { label: "FAQ", href: "#faq" },
+        { label: "Help Center", href: "/contact" },
+        { label: "Contact Us", href: "/contact" },
+        { label: "FAQ", href: "/contact" },
         { label: "Terms of Service", href: "#terms" },
         { label: "Privacy Policy", href: "#privacy" },
       ],
@@ -95,11 +94,8 @@ const Footer = () => {
     {
       title: "For Owners",
       links: [
-        { label: "List Your Property", href: "#list-property" },
-        { label: "Owner Portal", href: "#owner-portal" },
-        { label: "Pricing Plans", href: "#pricing" },
-        { label: "Success Stories", href: "#success" },
-        { label: "Resources", href: "#resources" },
+        { label: "List Your Property", href: "/login" },
+        { label: "Owner Portal", href: "/login" },
       ],
     },
   ];
@@ -116,20 +112,14 @@ const Footer = () => {
     {
       icon: Phone,
       label: "Phone",
-      value: "+91 98765 43210",
-      href: "tel:+919876543210",
+      value: "+91 8852019731",
+      href: "tel:+918852019731",
     },
     {
       icon: Mail,
       label: "Email",
       value: "support@pgnearu.com",
       href: "mailto:support@pgnearu.com",
-    },
-    {
-      icon: MapPin,
-      label: "Address",
-      value: "123 Tech Park, Delhi, Delhi 110001",
-      href: "#",
     },
   ];
 
@@ -206,13 +196,23 @@ const Footer = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: linkIndex * 0.05 }}
                   >
-                    <a
-                      href={link.href}
-                      className="text-muted-foreground hover:text-primary transition-colors duration-300 text-sm relative group"
-                    >
-                      {link.label}
-                      <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 group-hover:w-full"></span>
-                    </a>
+                    {link.href.startsWith('#') ? (
+                      <a
+                        href={link.href}
+                        className="text-muted-foreground hover:text-primary transition-colors duration-300 text-sm relative group"
+                      >
+                        {link.label}
+                        <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 group-hover:w-full"></span>
+                      </a>
+                    ) : (
+                      <Link
+                        to={link.href}
+                        className="text-muted-foreground hover:text-primary transition-colors duration-300 text-sm relative group"
+                      >
+                        {link.label}
+                        <span className="absolute bottom-0 left-0 w-0 h-px bg-primary transition-all duration-300 group-hover:w-full"></span>
+                      </Link>
+                    )}
                   </motion.li>
                 ))}
               </ul>
@@ -272,7 +272,7 @@ const Footer = () => {
             {/* Copyright */}
             <div className="text-center md:text-left">
               <p className="text-muted-foreground text-sm">
-                © 2024 PgNearU. All rights reserved. Made with ❤️ in India
+                © 2025 PgNearU. All rights reserved. Made with ❤️ in India
               </p>
             </div>
 

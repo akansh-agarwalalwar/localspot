@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { SubadminFormData } from '../../types';
-import { adminAPI } from '../../services/api';
 
 interface CreateSubadminProps {
   onSubmit: (data: SubadminFormData) => Promise<boolean>;
@@ -333,5 +332,3 @@ const CreateSubadmin: React.FC<CreateSubadminProps> = ({ onSubmit, loading = fal
 };
 
 export default CreateSubadmin;
-
-// All API calls are already using the imported adminAPI from services/api.ts

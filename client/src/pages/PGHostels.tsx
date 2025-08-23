@@ -27,6 +27,8 @@ const PGHostels = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 25000]); // Changed from [5000, 20000] to include all properties
   const [distanceRange, setDistanceRange] = useState([0, 5000]); // Distance in meters (0 to 5km)
+  const [selectedRoomTypes, setSelectedRoomTypes] = useState<string[]>([]);
+  const [selectedACTypes, setSelectedACTypes] = useState<string[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -212,6 +214,26 @@ const PGHostels = () => {
     toast.success('Redirecting to WhatsApp...');
   };
 
+  // Handle room type filter change
+  const handleRoomTypeChange = (roomType: string) => {
+    setSelectedRoomTypes(prev => {
+      const newSelection = prev.includes(roomType)
+        ? prev.filter(type => type !== roomType)
+        : [...prev, roomType];
+      return newSelection;
+    });
+  };
+
+  // Handle AC type filter change
+  const handleACTypeChange = (acType: string) => {
+    setSelectedACTypes(prev => {
+      const newSelection = prev.includes(acType)
+        ? prev.filter(type => type !== acType)
+        : [...prev, acType];
+      return newSelection;
+    });
+  };
+
   // Filter and sort properties
   const filteredProperties = properties.filter(property => {
     const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -241,8 +263,35 @@ const PGHostels = () => {
         return true;
       }
     })();
+
+    // Room type filtering
+    const matchesRoomType = selectedRoomTypes.length === 0 || 
+      selectedRoomTypes.some(selectedType => {
+        // Map UI room types to backend field names
+        const roomTypeMap: { [key: string]: string } = {
+          'Single Seater': 'single',
+          'Double Seater': 'double', 
+          'Triple Seater': 'triple'
+        };
+        const backendType = roomTypeMap[selectedType];
+        return property.roomTypes && property.roomTypes[backendType];
+      });
+
+    // AC type filtering
+    const matchesACType = selectedACTypes.length === 0 || 
+      selectedACTypes.some(selectedAC => {
+        if (selectedAC === 'AC') {
+          // Check if property has AC amenity
+          return property.amenities && property.amenities.ac === true;
+        }
+        if (selectedAC === 'Non-AC') {
+          // Check if property does NOT have AC amenity
+          return !property.amenities || property.amenities.ac === false;
+        }
+        return false;
+      });
     
-    return matchesSearch && matchesPrice && matchesDistance && property.isActive;
+    return matchesSearch && matchesPrice && matchesDistance && matchesRoomType && matchesACType && property.isActive;
   });
 
   // Sort properties based on selected criteria
@@ -291,18 +340,18 @@ const PGHostels = () => {
               <div className="grid md:grid-cols-3 gap-4">
                 <Input 
                   placeholder="Search location..." 
-                  className="bg-white" 
+                  className="bg-white text-black placeholder:text-gray-500" 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <Select>
-                  <SelectTrigger className="bg-white">
+                  <SelectTrigger className="bg-white text-black">
                     <SelectValue placeholder="Room Type" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="single">Single Seater</SelectItem>
-                    <SelectItem value="double">Double Seater</SelectItem>
-                    <SelectItem value="triple">Triple Seater</SelectItem>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="single" className="text-black hover:bg-gray-100">Single Seater</SelectItem>
+                    <SelectItem value="double" className="text-black hover:bg-gray-100">Double Seater</SelectItem>
+                    <SelectItem value="triple" className="text-black hover:bg-gray-100">Triple Seater</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button className="bg-gradient-primary hover:opacity-90">
@@ -352,7 +401,11 @@ const PGHostels = () => {
                   <h4 className="font-medium">Room Type</h4>
                   {["Single Seater", "Double Seater", "Triple Seater"].map((type) => (
                     <div key={type} className="flex items-center space-x-2">
-                      <Checkbox id={type} />
+                      <Checkbox 
+                        id={type}
+                        checked={selectedRoomTypes.includes(type)}
+                        onCheckedChange={() => handleRoomTypeChange(type)}
+                      />
                       <label htmlFor={type} className="text-sm">{type}</label>
                     </div>
                   ))}
@@ -363,7 +416,11 @@ const PGHostels = () => {
                   <h4 className="font-medium">AC Type</h4>
                   {["AC", "Non-AC"].map((type) => (
                     <div key={type} className="flex items-center space-x-2">
-                      <Checkbox id={type} />
+                      <Checkbox 
+                        id={type}
+                        checked={selectedACTypes.includes(type)}
+                        onCheckedChange={() => handleACTypeChange(type)}
+                      />
                       <label htmlFor={type} className="text-sm">{type}</label>
                     </div>
                   ))}
@@ -440,13 +497,13 @@ const PGHostels = () => {
                   Filters
                 </Button>
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-48">
+                  <SelectTrigger className="w-48 text-black">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="price-low">Price: Low to High</SelectItem>
-                    <SelectItem value="price-high">Price: High to Low</SelectItem>
-                    <SelectItem value="newest">Newest First</SelectItem>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="price-low" className="text-black hover:bg-gray-100">Price: Low to High</SelectItem>
+                    <SelectItem value="price-high" className="text-black hover:bg-gray-100">Price: High to Low</SelectItem>
+                    <SelectItem value="newest" className="text-black hover:bg-gray-100">Newest First</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -697,6 +754,7 @@ const PGHostels = () => {
                 placeholder="Enter your full name" 
                 value={bookingForm.name}
                 onChange={(e) => handleFormChange('name', e.target.value)}
+                className="text-black placeholder:text-gray-500"
               />
             </div>
             <div className="space-y-2">
@@ -706,6 +764,7 @@ const PGHostels = () => {
                 placeholder="Enter your mobile number" 
                 value={bookingForm.mobile}
                 onChange={(e) => handleFormChange('mobile', e.target.value)}
+                className="text-black placeholder:text-gray-500"
               />
             </div>
             <div className="space-y-2">
@@ -716,28 +775,27 @@ const PGHostels = () => {
                 placeholder="Enter your email address" 
                 value={bookingForm.email}
                 onChange={(e) => handleFormChange('email', e.target.value)}
+                className="text-black placeholder:text-gray-500"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="room-type">Room Type</Label>
               <Select value={bookingForm.roomType} onValueChange={(value) => handleFormChange('roomType', value)}>
-                <SelectTrigger>
+                <SelectTrigger className="text-black">
                   <SelectValue placeholder="Select room type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   {(() => {
                     if (selectedProperty) {
                       const availableRoomTypes = getAvailableRoomTypes(selectedProperty);
                       if (availableRoomTypes.length > 0) {
                         return availableRoomTypes.map((roomType) => (
-                          <SelectItem key={roomType.key} value={roomType.key}>
-                            {roomType.label} Room - ₹{selectedProperty.price.toLocaleString()}
-                          </SelectItem>
+                          <SelectItem key={roomType.key} value={roomType.key} className="text-black hover:bg-gray-100">{roomType.label} Room - ₹{selectedProperty.price.toLocaleString()}</SelectItem>
                         ));
                       }
                     }
                     return (
-                      <SelectItem value="standard">
+                      <SelectItem value="standard" className="text-black hover:bg-gray-100">
                         Standard Room - ₹{selectedProperty?.price?.toLocaleString() || 'N/A'}
                       </SelectItem>
                     );
@@ -752,6 +810,7 @@ const PGHostels = () => {
                 type="date" 
                 value={bookingForm.moveInDate}
                 onChange={(e) => handleFormChange('moveInDate', e.target.value)}
+                className="text-black"
               />
             </div>
             <div className="space-y-2">
@@ -761,6 +820,7 @@ const PGHostels = () => {
                 placeholder="Any special requirements..." 
                 value={bookingForm.message}
                 onChange={(e) => handleFormChange('message', e.target.value)}
+                className="text-black placeholder:text-gray-500"
               />
             </div>
             <Button 

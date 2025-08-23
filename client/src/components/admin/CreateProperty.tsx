@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { PropertyFormData } from '../../types';
 import { validateImageUrl, convertGoogleDriveUrl, getImagePreviewUrl } from '../../utils/imageUtils';
 import PropertyImage from '../common/PropertyImage';
-import { propertyAPI } from '../../services/api';
 
 interface CreatePropertyProps {
   onSubmit: (data: PropertyFormData) => Promise<boolean>;
@@ -754,4 +753,3 @@ const CreateProperty: React.FC<CreatePropertyProps> = ({ onSubmit, loading = fal
 };
 
 export default CreateProperty;
-// All API calls are already using the imported propertyAPI from services/api.ts
