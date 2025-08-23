@@ -664,30 +664,26 @@ const EditProperty: React.FC<EditPropertyProps> = ({ property, onUpdate, onClose
                 <p className="text-sm text-red-600">{validationErrors.pics}</p>
               )}
             </div>
-          </form>
-        </div>
 
-        {/* Footer Actions */}
-        <div className="px-8 py-6 border-t border-gray-200 bg-gray-50 flex justify-end gap-4">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            onClick={(e) => {
-              e.preventDefault();
-              handleSubmit(e as any);
-            }}
-            disabled={isSubmitting}
-            className="px-6 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
-          >
-            {isSubmitting ? 'Updating...' : 'Update Property'}
-          </button>
+            {/* Form Action Buttons */}
+            <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-6 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
+              >
+                {isSubmitting ? 'Updating...' : 'Update Property'}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

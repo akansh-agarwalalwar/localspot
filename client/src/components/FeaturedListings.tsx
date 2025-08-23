@@ -290,7 +290,6 @@ const FeaturedListings = () => {
             </div>
           ) : (
             listings.map((listing) => {
-              const badgeInfo = getBadgeInfo(listing);
               const pricingInfo = getPricingDisplay(listing);
               const features = getFeatures(listing);
               
@@ -367,20 +366,6 @@ const FeaturedListings = () => {
                           <span>{listing.location}</span>
                         </div>
                       </div>
-                      <Badge className={badgeInfo.className}>
-                        {badgeInfo.text}
-                      </Badge>
-                    </div>
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="font-semibold">4.5</span>
-                      </div>
-                      <span className="text-muted-foreground text-sm">
-                        (120+ reviews)
-                      </span>
                     </div>
 
                     {/* Features - Real amenities with cool colors and icons */}
