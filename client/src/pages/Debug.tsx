@@ -12,7 +12,7 @@ const Debug: React.FC = () => {
 
   const testLogin = async () => {
     try {
-      const response = await fetch('http://localhost:5004/api/auth/login', {
+      const response = await fetch('https://localspot-spq8.onrender.com/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

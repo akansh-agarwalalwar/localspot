@@ -36,7 +36,7 @@ const Footer = () => {
     setIsSubscribing(true);
 
     try {
-      const response = await fetch('http://localhost:5004/api/subscription/subscribe', {
+      const response = await fetch('https://localspot-spq8.onrender.com/api/subscription/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

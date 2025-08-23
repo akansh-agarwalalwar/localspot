@@ -45,7 +45,7 @@ const SubscriptionManager: React.FC = () => {
   const fetchSubscriptions = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5004/api/subscription/all', {
+      const response = await fetch('https://localspot-spq8.onrender.com/api/subscription/all', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
