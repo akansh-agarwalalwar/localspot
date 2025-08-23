@@ -8,28 +8,39 @@ const generateToken = (userId) => {
 
 const register = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { username, name, email, password, branch, year, state } = req.body;
 
-        if (!username || !email || !password) {
-            return res.status(400).json({ message: 'Username, email, and password are required' });
+        if (!username || !name || !email || !password || !branch || !year || !state) {
+            return res.status(400).json({ 
+                message: 'Username, name, email, password, branch, year, and state are required' 
+            });
         }
 
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) {
-            return res.status(400).json({ message: 'User with this email or username already exists' });
+            if (existingUser.email === email) {
+                return res.status(400).json({ message: 'User with this email already exists' });
+            }
+            if (existingUser.username === username) {
+                return res.status(400).json({ message: 'Username is already taken' });
+            }
         }
 
         const user = new User({
             username,
+            name,
             email,
             password,
+            branch,
+            year,
+            state,
             role: 'user' // Regular user role for signups
         });
 
         await user.save();
 
         await logActivity(user._id, 'SIGNUP', 'USER', user._id.toString(), 
-            `New user registered: ${username} (${email})`, req.ip, req.get('User-Agent'));
+            `New user registered: ${name} (${email})`, req.ip, req.get('User-Agent'));
 
         const token = generateToken(user._id);
 
@@ -39,8 +50,12 @@ const register = async (req, res) => {
             user: {
                 id: user._id,
                 username: user.username,
+                name: user.name,
                 email: user.email,
                 role: user.role,
+                branch: user.branch,
+                year: user.year,
+                state: user.state,
                 permissions: user.permissions
             }
         });
@@ -86,8 +101,12 @@ const login = async (req, res) => {
             user: {
                 id: user._id,
                 username: user.username,
+                name: user.name,
                 email: user.email,
                 role: user.role,
+                branch: user.branch,
+                year: user.year,
+                state: user.state,
                 permissions: user.permissions,
                 lastLogin: user.lastLogin
             }
@@ -115,8 +134,12 @@ const getProfile = async (req, res) => {
             user: {
                 id: req.user._id,
                 username: req.user.username,
+                name: req.user.name,
                 email: req.user.email,
                 role: req.user.role,
+                branch: req.user.branch,
+                year: req.user.year,
+                state: req.user.state,
                 permissions: req.user.permissions,
                 lastLogin: req.user.lastLogin
             }

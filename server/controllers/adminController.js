@@ -203,3 +203,164 @@ module.exports = {
     updateSubadmin,
     deleteSubadmin
 };
+
+// User Management Functions
+const getAllUsers = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        const role = req.query.role; // Filter by role if provided
+
+        let query = {};
+        if (role && ['user', 'subadmin', 'admin'].includes(role)) {
+            query.role = role;
+        }
+
+        const users = await User.find(query)
+            .select('-password')
+            .populate('createdBy', 'username email')
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 });
+
+        const total = await User.countDocuments(query);
+
+        // Transform _id to id for frontend compatibility
+        const transformedUsers = users.map(user => ({
+            ...user.toObject(),
+            id: user._id.toString(),
+        }));
+
+        await logActivity(req.user._id, 'READ', 'USER', null, 
+            `Retrieved users list (page ${page}, role: ${role || 'all'})`, req.ip, req.get('User-Agent'));
+
+        res.json({
+            users: transformedUsers,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit)
+            }
+        });
+    } catch (error) {
+        console.error('Get users error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+const updateUserRole = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { role, permissions } = req.body;
+
+        if (!['user', 'subadmin'].includes(role)) {
+            return res.status(400).json({ message: 'Invalid role. Only user and subadmin roles can be assigned.' });
+        }
+
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Prevent changing admin roles
+        if (user.role === 'admin') {
+            return res.status(403).json({ message: 'Cannot modify admin user roles' });
+        }
+
+        const oldRole = user.role;
+        user.role = role;
+
+        // Set permissions based on role
+        if (role === 'subadmin') {
+            user.permissions = permissions || {
+                canCreate: false,
+                canRead: true,
+                canUpdate: false,
+                canDelete: false
+            };
+            user.createdBy = req.user._id;
+        } else if (role === 'user') {
+            user.permissions = {
+                canCreate: false,
+                canRead: true,
+                canUpdate: false,
+                canDelete: false
+            };
+            user.createdBy = null;
+        }
+
+        await user.save();
+
+        await logActivity(req.user._id, 'UPDATE', 'USER', user._id.toString(), 
+            `Changed user role from ${oldRole} to ${role}: ${user.username || user.name}`, 
+            req.ip, req.get('User-Agent'));
+
+        res.json({
+            message: 'User role updated successfully',
+            user: {
+                id: user._id,
+                username: user.username,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                permissions: user.permissions,
+                isActive: user.isActive,
+                createdAt: user.createdAt
+            }
+        });
+    } catch (error) {
+        console.error('Update user role error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+const toggleUserStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Prevent changing admin status
+        if (user.role === 'admin') {
+            return res.status(403).json({ message: 'Cannot modify admin user status' });
+        }
+
+        user.isActive = !user.isActive;
+        await user.save();
+
+        await logActivity(req.user._id, 'UPDATE', 'USER', user._id.toString(), 
+            `${user.isActive ? 'Activated' : 'Deactivated'} user: ${user.username || user.name}`, 
+            req.ip, req.get('User-Agent'));
+
+        res.json({
+            message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
+            user: {
+                id: user._id,
+                username: user.username,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                isActive: user.isActive
+            }
+        });
+    } catch (error) {
+        console.error('Toggle user status error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+module.exports = {
+    createSubadmin,
+    getAllSubadmins,
+    getSubadminById,
+    updateSubadmin,
+    deleteSubadmin,
+    getAllUsers,
+    updateUserRole,
+    toggleUserStatus
+};

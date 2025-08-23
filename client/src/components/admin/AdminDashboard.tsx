@@ -18,6 +18,7 @@ import GamingZoneList from './GamingZoneList';
 import CreateGamingZone from './CreateGamingZone';
 import EditGamingZone from './EditGamingZone';
 import ActivityLog from './ActivityLog';
+import UserManagement from './UserManagement';
 
 const AdminDashboard: React.FC = () => {
   const { user, logout, refreshUserProfile } = useAuth();
@@ -66,10 +67,10 @@ const AdminDashboard: React.FC = () => {
     pages: 0,
   });
 
-  const fetchSubadmins = async (page = 1): Promise<void> => {
+  const fetchSubadmins = async (): Promise<void> => {
     try {
       setLoading(true);
-      const response = await adminAPI.getAllSubadmins({ page, limit: pagination.limit });
+      const response = await adminAPI.getAllSubadmins({ page: 1, limit: 1000 }); // Large limit to get all subadmins
       setSubadmins(response.data.subadmins);
       setPagination(response.data.pagination);
     } catch (error) {
@@ -135,7 +136,7 @@ const AdminDashboard: React.FC = () => {
       setLoading(true);
       // Fetch all data needed for overview statistics
       const [subadminsRes, propertiesRes, messesRes, gamingZonesRes] = await Promise.all([
-        adminAPI.getAllSubadmins({ page: 1, limit: 1 }), // Just get count
+        adminAPI.getAllSubadmins({ page: 1, limit: 1000 }), // Get all subadmins
         propertyAPI.getAllPropertiesAdmin({ page: 1, limit: 1 }),
         messAPI.getAllMessesAdmin({ page: 1, limit: 1 }),
         gamingZoneAPI.getAllGamingZonesAdmin({ page: 1, limit: 1 }),
@@ -403,7 +404,7 @@ const AdminDashboard: React.FC = () => {
     >
       {/* Tabs */}
       <div className="mb-6 flex flex-wrap gap-2">
-        {(['overview','subadmins','create','properties','add-property','messes','add-messes','gaming-zones','add-gaming-zone','activities'] as const).map(t => (
+        {(['overview','users','subadmins','create','properties','add-property','messes','add-messes','gaming-zones','add-gaming-zone','activities'] as const).map(t => (
           <button
             key={t}
             onClick={() => handleTabChange(t)}
@@ -414,6 +415,7 @@ const AdminDashboard: React.FC = () => {
               }`}
           >
             {t === 'overview' ? 'Overview' :
+             t === 'users' ? 'User Management' :
              t === 'subadmins' ? 'Subadmins' :
              t === 'create' ? 'Create Subadmin' :
              t === 'properties' ? 'Properties' :
@@ -510,6 +512,11 @@ const AdminDashboard: React.FC = () => {
         </div>
       )}
 
+      {/* User Management */}
+      {activeTab === 'users' && (
+        <UserManagement onCreateSubadmin={() => handleTabChange('create')} />
+      )}
+
       {/* Subadmins Table */}
       {activeTab === 'subadmins' && (
         <SubadminList
@@ -518,7 +525,7 @@ const AdminDashboard: React.FC = () => {
           pagination={pagination}
           onUpdate={handleUpdateSubadmin}
           onDelete={handleDeleteSubadmin}
-          onPageChange={fetchSubadmins}
+          showPagination={false} // Disable pagination
         />
       )}
 

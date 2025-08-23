@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
-import Login from "./components/Login";
+import Auth from "./components/Auth";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import SubadminDashboard from "./components/subadmin/SubadminDashboard";
 import Index from "./pages/Index";
@@ -47,7 +47,7 @@ const App = () => (
             <Route path="/debug" element={<Debug />} />
 
             {/* Authentication Routes - PUBLIC */}
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<Auth />} />
 
             {/* Admin Routes - PROTECTED */}
             <Route

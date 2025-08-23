@@ -1,13 +1,23 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Bell, Phone, Menu, X, Briefcase, Sparkles } from "lucide-react";
+import { Search, Bell, Phone, Menu, X, Briefcase, Sparkles, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const navItems = [
     { label: "PG / Hostels", href: "/pg-hostels" },
@@ -116,18 +126,57 @@ const Header = () => {
                   )}
                 </motion.div>
               ))}
-              {/* Login/Signup Button */}
+              {/* Login/Signup or User Dropdown Button */}
               <motion.div
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.1 + navItems.length * 0.1 }}
               >
-                <Button
-                  onClick={() => navigate('/login')}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-full transition-all duration-300 hover:scale-105"
-                >
-                  Login / Signup
-                </Button>
+                {isAuthenticated && user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="bg-primary/10 hover:bg-primary/20 text-primary border-primary px-6 py-2 rounded-full transition-all duration-300 hover:scale-105"
+                      >
+                        <User className="h-4 w-4 mr-2" />
+                        @{user.username}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuLabel>
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium leading-none">{user.name}</p>
+                          <p className="text-xs leading-none text-muted-foreground">@{user.username}</p>
+                          <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {user.role === 'admin' && (
+                        <DropdownMenuItem onClick={() => navigate('/admin')}>
+                          Admin Dashboard
+                        </DropdownMenuItem>
+                      )}
+                      {user.role === 'subadmin' && (
+                        <DropdownMenuItem onClick={() => navigate('/subadmin')}>
+                          Subadmin Dashboard
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={logout} className="text-red-600">
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Button
+                    onClick={() => navigate('/login')}
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-full transition-all duration-300 hover:scale-105"
+                  >
+                    Login / Signup
+                  </Button>
+                )}
               </motion.div>
             </div>
 
@@ -194,22 +243,73 @@ const Header = () => {
                   )}
                 </motion.div>
               ))}
-              {/* Mobile Login/Signup Button */}
+              {/* Mobile Login/Signup or User Info */}
               <motion.div
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: isMenuOpen ? 0 : -20, opacity: isMenuOpen ? 1 : 0 }}
                 transition={{ duration: 0.3, delay: navItems.length * 0.1 }}
                 className="pt-2"
               >
-                <Button
-                  onClick={() => {
-                    navigate('/login');
-                    setIsMenuOpen(false);
-                  }}
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-2 rounded-lg transition-all duration-300"
-                >
-                  Login / Signup
-                </Button>
+                {isAuthenticated && user ? (
+                  <div className="space-y-2">
+                    <div className="bg-primary/10 rounded-lg p-3 border border-primary/20">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-primary text-primary-foreground rounded-full p-2">
+                          <User className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{user.name}</p>
+                          <p className="text-xs text-muted-foreground">@{user.username}</p>
+                        </div>
+                      </div>
+                    </div>
+                    {user.role === 'admin' && (
+                      <Button
+                        onClick={() => {
+                          navigate('/admin');
+                          setIsMenuOpen(false);
+                        }}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        Admin Dashboard
+                      </Button>
+                    )}
+                    {user.role === 'subadmin' && (
+                      <Button
+                        onClick={() => {
+                          navigate('/subadmin');
+                          setIsMenuOpen(false);
+                        }}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        Subadmin Dashboard
+                      </Button>
+                    )}
+                    <Button
+                      onClick={() => {
+                        logout();
+                        setIsMenuOpen(false);
+                      }}
+                      variant="destructive"
+                      className="w-full"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Logout
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      navigate('/login');
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-2 rounded-lg transition-all duration-300"
+                  >
+                    Login / Signup
+                  </Button>
+                )}
               </motion.div>
             </div>
           </motion.div>

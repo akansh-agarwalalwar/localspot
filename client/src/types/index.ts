@@ -2,7 +2,7 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  role: 'admin' | 'subadmin';
+  role: 'admin' | 'subadmin' | 'user';
   permissions: {
     canCreate: boolean;
     canRead: boolean;
@@ -10,6 +10,11 @@ export interface User {
     canDelete: boolean;
     [key: string]: boolean;
   };
+  // Regular user specific fields
+  name?: string;
+  branch?: string;
+  year?: string;
+  state?: string;
   isActive?: boolean;
   lastLogin?: string | null;
   createdAt?: string;
@@ -50,6 +55,16 @@ export interface AuthState {
 export interface LoginCredentials {
   email: string;
   password: string;
+}
+
+export interface SignupCredentials {
+  username: string;
+  name: string;
+  email: string;
+  password: string;
+  branch: string;
+  year: string;
+  state: string;
 }
 
 export interface LoginResponse {

@@ -5,11 +5,13 @@ import {
   AuthState, 
   User, 
   LoginCredentials, 
+  SignupCredentials,
   LoginResponse 
 } from '../types';
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<LoginResponse>;
+  signup: (credentials: SignupCredentials) => Promise<LoginResponse>;
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
   refreshUserProfile: () => Promise<void>;
@@ -148,6 +150,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const signup = async (credentials: SignupCredentials): Promise<LoginResponse> => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      const response = await authAPI.signup(credentials);
+      const { token, user } = response.data;
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      dispatch({
+        type: 'LOGIN_SUCCESS',
+        payload: { token, user },
+      });
+
+      toast.success('Signup successful! Welcome to LocalSpot!');
+      return { success: true, user };
+    } catch (error: any) {
+      dispatch({ type: 'SET_LOADING', payload: false });
+      const message = error.response?.data?.message || 'Signup failed';
+      toast.error(message);
+      return { success: false, message };
+    }
+  };
+
   const logout = async (): Promise<void> => {
     try {
       await authAPI.logout();
@@ -189,6 +215,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       value={{
         ...state,
         login,
+        signup,
         logout,
         updateUser,
         refreshUserProfile,

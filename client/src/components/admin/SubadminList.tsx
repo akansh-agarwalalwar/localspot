@@ -8,7 +8,8 @@ interface SubadminListProps {
   pagination: Pagination;
   onUpdate: (id: string, data: Partial<SubadminFormData>) => Promise<boolean>;
   onDelete: (id: string) => Promise<void>;
-  onPageChange: (page: number) => Promise<void>;
+  onPageChange?: (page: number) => Promise<void>;
+  showPagination?: boolean;
 }
 
 const SubadminList: React.FC<SubadminListProps> = ({ 
@@ -17,7 +18,8 @@ const SubadminList: React.FC<SubadminListProps> = ({
   pagination, 
   onUpdate, 
   onDelete, 
-  onPageChange 
+  onPageChange,
+  showPagination = true
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<SubadminFormData>>({});
@@ -301,36 +303,38 @@ const SubadminList: React.FC<SubadminListProps> = ({
             </div>
 
             {/* Pagination */}
-            <div className="bg-white px-6 py-3 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center text-sm text-gray-500">
-                  <span>
-                    Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
-                    {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-                    {pagination.total} results
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    disabled={pagination.page === 1}
-                    onClick={() => onPageChange(pagination.page - 1)}
-                    className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    Previous
-                  </button>
-                  <span className="text-sm text-gray-700">
-                    Page {pagination.page} of {pagination.pages}
-                  </span>
-                  <button
-                    disabled={pagination.page === pagination.pages}
-                    onClick={() => onPageChange(pagination.page + 1)}
-                    className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    Next
-                  </button>
+            {showPagination && onPageChange && pagination.pages > 1 && (
+              <div className="bg-white px-6 py-3 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <span>
+                      Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
+                      {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
+                      {pagination.total} results
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      disabled={pagination.page === 1}
+                      onClick={() => onPageChange(pagination.page - 1)}
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-sm text-gray-700">
+                      Page {pagination.page} of {pagination.pages}
+                    </span>
+                    <button
+                      disabled={pagination.page === pagination.pages}
+                      onClick={() => onPageChange(pagination.page + 1)}
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </>
         )}
       </div>

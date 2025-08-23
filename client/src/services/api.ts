@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { 
   LoginCredentials, 
+  SignupCredentials,
   SubadminFormData, 
   ActivityFilters,
   PropertyFormData,
@@ -50,6 +51,7 @@ api.interceptors.response.use(
 // Auth API
 export const authAPI = {
   login: (credentials: LoginCredentials) => api.post('/auth/login', credentials),
+  signup: (credentials: SignupCredentials) => api.post('/auth/register', credentials),
   logout: () => api.post('/auth/logout'),
   getProfile: () => api.get('/auth/profile'),
 };
@@ -61,6 +63,10 @@ export const adminAPI = {
   getSubadminById: (id: string) => api.get(`/admin/subadmins/${id}`),
   updateSubadmin: (id: string, data: Partial<SubadminFormData>) => api.put(`/admin/subadmins/${id}`, data),
   deleteSubadmin: (id: string) => api.delete(`/admin/subadmins/${id}`),
+  // User management
+  getAllUsers: (params = {}) => api.get('/admin/users', { params }),
+  updateUserRole: (id: string, data: { role: string; permissions?: any }) => api.put(`/admin/users/${id}/role`, data),
+  toggleUserStatus: (id: string) => api.put(`/admin/users/${id}/status`),
 };
 
 // Activity API

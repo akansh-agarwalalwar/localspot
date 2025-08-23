@@ -27,6 +27,26 @@ const userSchema = new mongoose.Schema({
         enum: ['admin', 'subadmin', 'user'],
         required: true
     },
+    // Regular user specific fields
+    name: {
+        type: String,
+        trim: true,
+        maxlength: 50
+    },
+    branch: {
+        type: String,
+        trim: true,
+        maxlength: 50
+    },
+    year: {
+        type: String,
+        trim: true
+    },
+    state: {
+        type: String,
+        trim: true,
+        maxlength: 50
+    },
     isActive: {
         type: Boolean,
         default: true
