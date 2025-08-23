@@ -7,7 +7,7 @@ import {
   LoginCredentials, 
   LoginResponse 
 } from '../types';
-
+import { API_BASE_URL } from '../services/api';
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<LoginResponse>;
   logout: () => Promise<void>;
@@ -81,8 +81,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           
           // Validate token by making a test API call
           try {
-            // Test if the token is still valid by calling a protected endpoint
-            const response = await fetch('https://localspot-spq8.onrender.com/api/auth/profile', {
+            // Use the API_BASE_URL from environment variable
+            const response = await fetch(`${API_BASE_URL}/auth/profile`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'

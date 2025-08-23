@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { adminAPI, propertyAPI, messAPI } from '../../services/api';
+import { adminAPI, propertyAPI } from '../../services/api';
 import { toast } from 'sonner';
-import { Subadmin, Pagination, SubadminFormData, Property, PropertyFormData, Mess, MessFormData } from '../../types';
+import { Subadmin, Pagination, SubadminFormData, Property, PropertyFormData } from '../../types';
 import DashboardLayout from '../layout/DashboardLayout';
 import StatCard from '../common/StatCard';
 import SubadminList from './SubadminList';
@@ -10,20 +10,15 @@ import CreateSubadmin from './CreateSubadmin';
 import PropertyList from './PropertyList';
 import CreateProperty from './CreateProperty';
 import EditProperty from './EditProperty';
-import MessList from './MessList';
-import CreateMess from './CreateMess';
-import EditMess from './EditMess';
-
+import { API_BASE_URL } from '../../services/api';
 const AdminDashboard: React.FC = () => {
   const { user, logout, refreshUserProfile } = useAuth();
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [subadmins, setSubadmins] = useState<Subadmin[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
-  const [messes, setMesses] = useState<Mess[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [creating, setCreating] = useState<boolean>(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
-  const [editingMess, setEditingMess] = useState<Mess | null>(null);
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
     limit: 10,
@@ -31,12 +26,6 @@ const AdminDashboard: React.FC = () => {
     pages: 0,
   });
   const [propertyPagination, setPropertyPagination] = useState<Pagination>({
-    page: 1,
-    limit: 12,
-    total: 0,
-    pages: 0,
-  });
-  const [messPagination, setMessPagination] = useState<Pagination>({
     page: 1,
     limit: 12,
     total: 0,
@@ -69,26 +58,11 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const fetchMesses = async (page = 1): Promise<void> => {
-    try {
-      setLoading(true);
-      const response = await messAPI.getAllMessesAdmin({ page, limit: messPagination.limit });
-      setMesses(response.data.messes || []);
-      setMessPagination(response.data.pagination || { page: 1, limit: 12, total: 0, pages: 0 });
-    } catch (error) {
-      toast.error('Failed to fetch messes');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (activeTab === 'subadmins') {
       fetchSubadmins();
     } else if (activeTab === 'properties') {
       fetchProperties();
-    } else if (activeTab === 'messes') {
-      fetchMesses();
     }
   }, [activeTab]);
 
@@ -194,54 +168,6 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleCreateMess = async (data: MessFormData): Promise<boolean> => {
-    try {
-      setCreating(true);
-      await messAPI.createMess(data);
-      toast.success('Mess created successfully');
-      fetchMesses();
-      setActiveTab('messes');
-      return true;
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to create mess';
-      toast.error(message);
-      return false;
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  const handleUpdateMess = async (id: string, data: Partial<MessFormData>): Promise<boolean> => {
-    try {
-      await messAPI.updateMess(id, data);
-      toast.success('Mess updated successfully');
-      fetchMesses();
-      setEditingMess(null); // Close edit modal after successful update
-      return true;
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to update mess';
-      toast.error(message);
-      return false;
-    }
-  };
-
-  const handleEditMess = (mess: Mess): void => {
-    setEditingMess(mess);
-  };
-
-  const handleDeleteMess = async (id: string): Promise<void> => {
-    if (window.confirm('Are you sure you want to delete this mess?')) {
-      try {
-        await messAPI.deleteMess(id);
-        toast.success('Mess deleted successfully');
-        fetchMesses();
-      } catch (error: any) {
-        const message = error.response?.data?.message || 'Failed to delete mess';
-        toast.error(message);
-      }
-    }
-  };
-
   return (
     <DashboardLayout
       title="Admin Control Center"
@@ -249,7 +175,7 @@ const AdminDashboard: React.FC = () => {
     >
       {/* Tabs */}
       <div className="mb-6 flex flex-wrap gap-2">
-        {(['overview','subadmins','create','properties','add-property','messes','add-messes','activities'] as const).map(t => (
+        {(['overview','subadmins','create','properties','add-property'] as const).map(t => (
           <button
             key={t}
             onClick={() => setActiveTab(t)}
@@ -263,9 +189,7 @@ const AdminDashboard: React.FC = () => {
              t === 'subadmins' ? 'Subadmins' :
              t === 'create' ? 'Create Subadmin' :
              t === 'properties' ? 'Properties' :
-             t === 'add-property' ? 'Add Property' :
-             t === 'messes' ? 'Messes' :
-             t === 'add-messes' ? 'Add Messes' : 'Activity Log'}
+             t === 'add-property' ? 'Add Property' : 'Activity Log'}
           </button>
         ))}
       </div>
@@ -371,25 +295,6 @@ const AdminDashboard: React.FC = () => {
         <CreateProperty onSubmit={handleCreateProperty} loading={creating} />
       )}
 
-      {/* Messes List */}
-      {activeTab === 'messes' && (
-        <MessList
-          messes={messes}
-          loading={loading}
-          pagination={messPagination}
-          currentUser={user}
-          onUpdate={handleUpdateMess}
-          onDelete={handleDeleteMess}
-          onPageChange={fetchMesses}
-          onEdit={handleEditMess}
-        />
-      )}
-
-      {/* Add Messes */}
-      {activeTab === 'add-messes' && (
-        <CreateMess onSubmit={handleCreateMess} loading={creating} />
-      )}
-
       {/* Activity Log Placeholder */}
       {activeTab === 'activities' && (
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
@@ -410,15 +315,6 @@ const AdminDashboard: React.FC = () => {
           property={editingProperty}
           onUpdate={handleUpdateProperty}
           onClose={() => setEditingProperty(null)}
-        />
-      )}
-
-      {/* Edit Mess Modal */}
-      {editingMess && (
-        <EditMess
-          mess={editingMess}
-          onUpdate={handleUpdateMess}
-          onClose={() => setEditingMess(null)}
         />
       )}
     </DashboardLayout>

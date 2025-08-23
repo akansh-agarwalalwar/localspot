@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { API_BASE_URL } from "@/services/api";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -36,7 +37,7 @@ const Footer = () => {
     setIsSubscribing(true);
 
     try {
-      const response = await fetch('https://localspot-spq8.onrender.com/api/subscription/subscribe', {
+      const response = await fetch(`${API_BASE_URL}/api/subscription/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
