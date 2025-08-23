@@ -585,11 +585,11 @@ Please confirm availability and booking details.`;
                         Book Gaming Session
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
+                    <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>Book Gaming Session</DialogTitle>
                       </DialogHeader>
-                      <div className="space-y-4">
+                      <div className="space-y-4 pb-4">
                         <div className="space-y-2">
                           <Label htmlFor="name">Full Name *</Label>
                           <Input 

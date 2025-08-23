@@ -703,11 +703,11 @@ Please confirm availability and booking details.`;
 
       {/* Booking Dialog */}
       <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Book Gaming Session</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 pb-4">
             {selectedGamingZone && (
               <div className="bg-muted/50 rounded-lg p-3 mb-4">
                 <h4 className="font-semibold text-sm">{selectedGamingZone.title}</h4>
