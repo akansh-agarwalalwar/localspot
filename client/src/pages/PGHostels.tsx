@@ -480,7 +480,19 @@ const PGHostels = () => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold">
-                  {loading ? "Loading..." : `Showing ${sortedProperties.length} of ${totalProperties} PGs & Hostels`}
+                  {loading ? "Loading..." : (() => {
+                    // Check if any filters are active
+                    const hasActiveFilters = searchTerm || 
+                                           priceRange[0] !== 0 || 
+                                           priceRange[1] !== 25000 || 
+                                           selectedRoomTypes.length > 0 || 
+                                           selectedACTypes.length > 0 || 
+                                           distanceRange[1] !== 5000;
+                    
+                    return hasActiveFilters 
+                      ? `Showing ${sortedProperties.length} out of ${totalProperties} results`
+                      : "PGs & Hostels in Delhi";
+                  })()}
                 </h2>
                 <p className="text-muted-foreground">Best accommodations in Delhi</p>
               </div>

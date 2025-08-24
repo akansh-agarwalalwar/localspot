@@ -420,7 +420,18 @@ Please provide more details about pricing and availability.`;
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold">
-                  {loading ? "Loading..." : `Showing ${sortedMesses.length} of ${totalMesses} Messes & Cafes`}
+                  {loading ? "Loading..." : (() => {
+                    // Check if any filters are active
+                    const hasActiveFilters = searchTerm || 
+                                           priceRange[0] !== 0 || 
+                                           priceRange[1] !== 200 || 
+                                           mealFilter.length > 0 || 
+                                           acFilter.length > 0;
+                    
+                    return hasActiveFilters 
+                      ? `Showing ${sortedMesses.length} out of ${totalMesses} results`
+                      : "Messes & Cafes in Delhi";
+                  })()}
                 </h2>
                 <p className="text-muted-foreground">Best food options in Delhi</p>
               </div>

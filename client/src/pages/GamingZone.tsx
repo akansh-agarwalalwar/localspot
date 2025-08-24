@@ -423,7 +423,17 @@ Please confirm availability and booking details.`;
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold">
-                  {loading ? "Loading..." : `Showing ${sortedGamingZones.length} of ${totalGamingZones} Gaming Zones`}
+                  {loading ? "Loading..." : (() => {
+                    // Check if any filters are active
+                    const hasActiveFilters = searchTerm || 
+                                           priceRange[0] !== 0 || 
+                                           priceRange[1] !== 5000 || 
+                                           selectedACTypes.length > 0;
+                    
+                    return hasActiveFilters 
+                      ? `Showing ${sortedGamingZones.length} out of ${totalGamingZones} results`
+                      : "Gaming Zones in Delhi";
+                  })()}
                 </h2>
                 <p className="text-muted-foreground">Premium gaming experiences in Delhi</p>
               </div>
