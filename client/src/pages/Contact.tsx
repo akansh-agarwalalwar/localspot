@@ -17,14 +17,14 @@ const Contact = () => {
     {
       icon: Phone,
       title: "Phone Support",
-      details: ["+91 8852019731", "+91 8852019731"],
+      details: ["+91 8852019731"],
       description: "Call us for immediate assistance",
       available: "24/7"
     },
     {
       icon: Mail,
       title: "Email Support", 
-      details: ["support@studentshub.com", "help@studentshub.com"],
+      details: ["helpstudentshub@gmail.com"],
       description: "Send us your queries anytime",
       available: "Response within 2 hours"
     },
