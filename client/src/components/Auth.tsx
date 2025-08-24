@@ -128,6 +128,8 @@ const Auth: React.FC = () => {
     'Chemical Engineering',
     'Engineering Physics',
     'Mathematics and Computing',
+    'Environment Engineering',
+    'Production',
     'Other'
   ];
 
