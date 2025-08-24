@@ -376,7 +376,7 @@ const EditProperty: React.FC<EditPropertyProps> = ({ property, onUpdate, onClose
 
                 <div>
                   <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
-                    Price per Month (₹) *
+                    💰 Price per Month (₹) *
                   </label>
                   <input
                     type="number"
@@ -673,7 +673,7 @@ const EditProperty: React.FC<EditPropertyProps> = ({ property, onUpdate, onClose
 
               <div className="bg-green-50 border border-green-200 rounded-md p-3">
                 <p className="text-sm text-green-800">
-                  📌 <strong>Cover Photo Guidelines:</strong>
+                  � <strong>Cover Photo Guidelines:</strong>
                 </p>
                 <ul className="text-sm text-green-700 mt-2 ml-4 list-disc">
                   <li>This will be the main image shown on listings and home page</li>

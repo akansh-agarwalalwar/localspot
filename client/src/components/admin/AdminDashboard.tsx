@@ -9,6 +9,7 @@ import StatCard from '../common/StatCard';
 import SubadminList from './SubadminList';
 import CreateSubadmin from './CreateSubadmin';
 import PropertyList from './PropertyList';
+import DormitoryList from './DormitoryList';
 import CreateProperty from './CreateProperty';
 import EditProperty from './EditProperty';
 import MessList from './MessList';
@@ -404,7 +405,7 @@ const AdminDashboard: React.FC = () => {
     >
       {/* Tabs */}
       <div className="mb-6 flex flex-wrap gap-2">
-        {(['overview','users','subadmins','create','properties','add-property','messes','add-messes','gaming-zones','add-gaming-zone','activities'] as const).map(t => (
+        {(['overview','users','subadmins','create','properties','dormitories','add-property','messes','add-messes','gaming-zones','add-gaming-zone','activities'] as const).map(t => (
           <button
             key={t}
             onClick={() => handleTabChange(t)}
@@ -419,6 +420,7 @@ const AdminDashboard: React.FC = () => {
              t === 'subadmins' ? 'Subadmins' :
              t === 'create' ? 'Create Subadmin' :
              t === 'properties' ? 'Properties' :
+             t === 'dormitories' ? 'Dormitories' :
              t === 'add-property' ? 'Add Property' :
              t === 'messes' ? 'Messes' :
              t === 'add-messes' ? 'Add Messes' :
@@ -476,6 +478,14 @@ const AdminDashboard: React.FC = () => {
                 <p className="text-sm text-gray-600 mt-1">Manage property listings</p>
               </button>
               <button
+                onClick={() => handleTabChange('dormitories')}
+                className="p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors text-left"
+              >
+                <div className="text-purple-600 text-2xl mb-2">🏠</div>
+                <h4 className="font-medium text-gray-900">Dormitories</h4>
+                <p className="text-sm text-gray-600 mt-1">Manage dormitory members</p>
+              </button>
+              <button
                 onClick={() => handleTabChange('add-messes')}
                 className="p-4 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors text-left"
               >
@@ -485,9 +495,9 @@ const AdminDashboard: React.FC = () => {
               </button>
               <button
                 onClick={() => handleTabChange('messes')}
-                className="p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors text-left"
+                className="p-4 bg-rose-50 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors text-left"
               >
-                <div className="text-purple-600 text-2xl mb-2">🏪</div>
+                <div className="text-rose-600 text-2xl mb-2">🏪</div>
                 <h4 className="font-medium text-gray-900">Messes</h4>
                 <p className="text-sm text-gray-600 mt-1">Manage mess listings</p>
               </button>
@@ -537,6 +547,20 @@ const AdminDashboard: React.FC = () => {
       {/* Properties List */}
       {activeTab === 'properties' && (
         <PropertyList
+          properties={properties}
+          loading={loading}
+          pagination={propertyPagination}
+          currentUser={user}
+          onUpdate={handleUpdateProperty}
+          onDelete={handleDeleteProperty}
+          onPageChange={fetchProperties}
+          onEdit={handleEditProperty}
+        />
+      )}
+
+      {/* Dormitories List */}
+      {activeTab === 'dormitories' && (
+        <DormitoryList
           properties={properties}
           loading={loading}
           pagination={propertyPagination}

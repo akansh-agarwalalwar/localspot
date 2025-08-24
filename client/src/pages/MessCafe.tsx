@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { messAPI } from "@/services/api";
 import { Mess } from "@/types";
 import PropertyImageFast from "@/components/common/PropertyImageFast";
@@ -22,6 +22,7 @@ import { toast } from "sonner";
 
 const MessCafe = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 200]); // Daily pricing range
   const [messes, setMesses] = useState<Mess[]>([]);
@@ -49,6 +50,12 @@ const MessCafe = () => {
   // Fetch messes from backend
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // Check for search parameter from URL
+    const urlSearchTerm = searchParams.get('search');
+    if (urlSearchTerm) {
+      setSearchTerm(urlSearchTerm);
+    }
     
     const fetchMesses = async () => {
       try {
@@ -302,24 +309,13 @@ Please provide more details about pricing and availability.`;
             
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto bg-white/95 backdrop-blur-lg rounded-2xl p-6">
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-2 gap-4">
                 <Input 
                   placeholder="Search location..." 
                   className="bg-white text-black placeholder:text-gray-500" 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <Select>
-                  <SelectTrigger className="bg-white text-black">
-                    <SelectValue placeholder="Meal Type" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectItem value="breakfast" className="text-black hover:bg-gray-100">Breakfast</SelectItem>
-                    <SelectItem value="lunch" className="text-black hover:bg-gray-100">Lunch</SelectItem>
-                    <SelectItem value="dinner" className="text-black hover:bg-gray-100">Dinner</SelectItem>
-                    <SelectItem value="snacks" className="text-black hover:bg-gray-100">Snacks</SelectItem>
-                  </SelectContent>
-                </Select>
                 <Button className="bg-gradient-primary hover:opacity-90">
                   Search
                 </Button>
@@ -559,7 +555,6 @@ Please provide more details about pricing and availability.`;
                               </Badge>
                             </div>
                             <div className="flex items-center gap-1 text-muted-foreground">
-                              <MapPin className="h-4 w-4" />
                               <span>{mess.location}</span>
                             </div>
                             <div className="flex items-center gap-1 text-muted-foreground text-sm mt-1">

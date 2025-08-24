@@ -515,7 +515,6 @@ Please provide more details about pricing and availability.`;
                               </Badge>
                             </div>
                             <div className="flex items-center gap-1 text-muted-foreground">
-                              <MapPin className="h-4 w-4" />
                               <span>{mess.location}</span>
                             </div>
                             <div className="flex items-center gap-1 text-muted-foreground text-sm mt-1">

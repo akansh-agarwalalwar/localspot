@@ -14,13 +14,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { gamingZoneAPI } from "@/services/api";
 import { GamingZone } from "@/types";
 import { toast } from "sonner";
 
 const GamingZonePage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 5000]); // Hourly price range
   const [selectedACTypes, setSelectedACTypes] = useState<string[]>([]);
@@ -48,6 +49,12 @@ const GamingZonePage = () => {
   useEffect(() => {
     // Ensure page starts from top when component mounts
     window.scrollTo(0, 0);
+    
+    // Check for search parameter from URL
+    const urlSearchTerm = searchParams.get('search');
+    if (urlSearchTerm) {
+      setSearchTerm(urlSearchTerm);
+    }
     
     const fetchGamingZones = async () => {
       try {
@@ -291,19 +298,13 @@ Please confirm availability and booking details.`;
             
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto bg-white/95 backdrop-blur-lg rounded-2xl p-6">
-              <div className="grid md:grid-cols-3 gap-4">
-                <Input placeholder="Search location..." className="bg-white text-black placeholder:text-gray-500" />
-                <Select>
-                  <SelectTrigger className="bg-white text-black">
-                    <SelectValue placeholder="Game Type" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectItem value="pc" className="text-black hover:bg-gray-100">PC Gaming</SelectItem>
-                    <SelectItem value="console" className="text-black hover:bg-gray-100">Console Gaming</SelectItem>
-                    <SelectItem value="vr" className="text-black hover:bg-gray-100">VR Gaming</SelectItem>
-                    <SelectItem value="mobile" className="text-black hover:bg-gray-100">Mobile Gaming</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid md:grid-cols-2 gap-4">
+                <Input 
+                  placeholder="Search location..." 
+                  className="bg-white text-black placeholder:text-gray-500" 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
                 <Button className="bg-gradient-primary hover:opacity-90">
                   Search
                 </Button>

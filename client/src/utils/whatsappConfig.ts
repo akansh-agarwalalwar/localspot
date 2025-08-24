@@ -17,7 +17,7 @@ export const createBookingMessage = (propertyDetails: any, customerDetails: any)
 📍 *Property Details:*
 • Name: ${propertyDetails.title}
 • Location: ${propertyDetails.location}
-• Price: ₹${propertyDetails.price.toLocaleString()}/month
+• Price: 💰 ₹${propertyDetails.price.toLocaleString()}/month
 
 👤 *Customer Details:*
 • Name: ${customerDetails.name}

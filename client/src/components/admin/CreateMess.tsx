@@ -260,7 +260,7 @@ const CreateMess: React.FC<CreateMessProps> = ({ onSubmit, loading }) => {
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">
-                        Price (₹)
+                                                💰 Price (₹)
                       </label>
                       <input
                         type="number"

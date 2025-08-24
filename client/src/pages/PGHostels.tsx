@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useSearchParams } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Header from "@/components/Header";
@@ -24,6 +25,7 @@ import { toast } from "sonner";
 
 const PGHostels = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 25000]); // Changed from [5000, 20000] to include all properties
   const [distanceRange, setDistanceRange] = useState([0, 5000]); // Distance in meters (0 to 5km)
@@ -53,6 +55,12 @@ const PGHostels = () => {
   useEffect(() => {
     // Ensure page starts from top when component mounts
     window.scrollTo(0, 0);
+    
+    // Check for search parameter from URL
+    const urlSearchTerm = searchParams.get('search');
+    if (urlSearchTerm) {
+      setSearchTerm(urlSearchTerm);
+    }
     
     const fetchProperties = async () => {
       try {
@@ -337,23 +345,13 @@ const PGHostels = () => {
             
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto bg-white/95 backdrop-blur-lg rounded-2xl p-6">
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-2 gap-4">
                 <Input 
                   placeholder="Search location..." 
                   className="bg-white text-black placeholder:text-gray-500" 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <Select>
-                  <SelectTrigger className="bg-white text-black">
-                    <SelectValue placeholder="Room Type" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectItem value="single" className="text-black hover:bg-gray-100">Single Seater</SelectItem>
-                    <SelectItem value="double" className="text-black hover:bg-gray-100">Double Seater</SelectItem>
-                    <SelectItem value="triple" className="text-black hover:bg-gray-100">Triple Seater</SelectItem>
-                  </SelectContent>
-                </Select>
                 <Button className="bg-gradient-primary hover:opacity-90">
                   Search
                 </Button>
@@ -621,7 +619,6 @@ const PGHostels = () => {
                               </Badge>
                             </div>
                             <div className="flex items-center gap-1 text-muted-foreground">
-                              <MapPin className="h-4 w-4" />
                               <span>{property.location}</span>
                             </div>
                           </div>

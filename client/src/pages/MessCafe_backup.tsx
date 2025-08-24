@@ -239,7 +239,6 @@ const MessCafe = () => {
                       {listing.name}
                     </h3>
                     <div className="flex items-center gap-1 text-muted-foreground text-sm">
-                      <MapPin className="h-4 w-4" />
                       <span>{listing.location}</span>
                     </div>
                   </div>

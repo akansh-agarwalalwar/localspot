@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [searchLocation, setSearchLocation] = useState("");
+  const [searchCategory, setSearchCategory] = useState("");
   const navigate = useNavigate();
 
   const slides = [
@@ -53,6 +55,34 @@ const HeroSection = () => {
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  const handleSearch = () => {
+    if (!searchCategory) {
+      // If no category selected, default to PG hostels
+      const searchParams = new URLSearchParams();
+      if (searchLocation.trim()) {
+        searchParams.append('search', searchLocation.trim());
+      }
+      navigate(`/pg-hostels?${searchParams.toString()}`);
+      return;
+    }
+
+    // Navigate to the selected category page with search parameters
+    const searchParams = new URLSearchParams();
+    if (searchLocation.trim()) {
+      searchParams.append('search', searchLocation.trim());
+    }
+
+    const routeMap: { [key: string]: string } = {
+      'pg-hostels': '/pg-hostels',
+      'mess-cafe': '/mess-cafe',
+      'gaming-zone': '/gaming-zone'
+    };
+
+    const route = routeMap[searchCategory] || '/pg-hostels';
+    navigate(`${route}?${searchParams.toString()}`);
+    window.scrollTo(0, 0);
   };
 
   return (
@@ -145,13 +175,18 @@ const HeroSection = () => {
                 <label className="text-sm font-medium text-muted-foreground">Location</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Enter city or area" className="pl-10" />
+                  <Input 
+                    placeholder="Enter city or area" 
+                    className="pl-10" 
+                    value={searchLocation}
+                    onChange={(e) => setSearchLocation(e.target.value)}
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">Category</label>
-                <Select>
+                <Select value={searchCategory} onValueChange={setSearchCategory}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
@@ -182,7 +217,11 @@ const HeroSection = () => {
                 </div>
               </div> */}
 
-              <Button className="w-full bg-gradient-primary hover:opacity-90" size="lg">
+              <Button 
+                className="w-full bg-gradient-primary hover:opacity-90" 
+                size="lg"
+                onClick={handleSearch}
+              >
                 Search Now
               </Button>
             </div>

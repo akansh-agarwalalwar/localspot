@@ -87,8 +87,6 @@ const Footer = () => {
         { label: "Help Center", href: "/contact" },
         { label: "Contact Us", href: "/contact" },
         { label: "FAQ", href: "/contact" },
-        { label: "Terms of Service", href: "#terms" },
-        { label: "Privacy Policy", href: "#privacy" },
       ],
     },
     {

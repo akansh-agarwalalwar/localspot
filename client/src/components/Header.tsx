@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Bell, Phone, Menu, X, Briefcase, Sparkles, User, LogOut } from "lucide-react";
+import { Bell, Phone, Menu, X, Briefcase, Sparkles, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -47,6 +46,7 @@ const Header = () => {
               variant="ghost"
               size="sm"
               className="text-primary-foreground hover:bg-primary-hover"
+              onClick={() => window.open('tel:+918852019731', '_self')}
             >
               <Phone className="h-4 w-4 mr-1" />
               <span className="hidden sm:inline">+91 88520 19731</span>
@@ -86,15 +86,6 @@ const Header = () => {
                 className="h-12 w-auto object-contain"
               />
             </motion.div>
-
-            {/* Search Bar - Desktop */}
-            <div className="hidden md:flex items-center gap-2 bg-muted rounded-full px-4 py-2 flex-1 max-w-md mx-8">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by location, category..."
-                className="border-0 bg-transparent text-black placeholder:text-muted-foreground focus-visible:ring-0"
-              />
-            </div>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-6">
@@ -190,21 +181,6 @@ const Header = () => {
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
-
-          {/* Mobile Search Bar */}
-          <motion.div 
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: isMenuOpen ? "auto" : 0, opacity: isMenuOpen ? 1 : 0 }}
-            className="md:hidden mt-4 overflow-hidden"
-          >
-            <div className="flex items-center gap-2 bg-muted rounded-full px-4 py-2">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by location, category..."
-                className="border-0 bg-transparent text-black placeholder:text-muted-foreground focus-visible:ring-0"
-              />
-            </div>
-          </motion.div>
 
           {/* Mobile Navigation Menu */}
           <motion.div

@@ -48,25 +48,37 @@ const propertySchema = new mongoose.Schema({
     dormitoryMembers: [{
         fullName: {
             type: String,
-            required: function() { return this.roomTypes.dormitory; },
+            required: function() { 
+                // Access parent document to check if dormitory is selected
+                return this.parent().roomTypes.dormitory; 
+            },
             trim: true,
             maxlength: 100
         },
         year: {
             type: String,
-            required: function() { return this.roomTypes.dormitory; },
+            required: function() { 
+                // Access parent document to check if dormitory is selected
+                return this.parent().roomTypes.dormitory; 
+            },
             trim: true,
             maxlength: 50
         },
         state: {
             type: String,
-            required: function() { return this.roomTypes.dormitory; },
+            required: function() { 
+                // Access parent document to check if dormitory is selected
+                return this.parent().roomTypes.dormitory; 
+            },
             trim: true,
             maxlength: 100
         },
         branch: {
             type: String,
-            required: function() { return this.roomTypes.dormitory; },
+            required: function() { 
+                // Access parent document to check if dormitory is selected
+                return this.parent().roomTypes.dormitory; 
+            },
             trim: true,
             maxlength: 100
         }
@@ -247,5 +259,26 @@ propertySchema.set('toObject', { virtuals: true });
 propertySchema.index({ title: 'text', location: 'text', description: 'text' });
 propertySchema.index({ createdBy: 1 });
 propertySchema.index({ isActive: 1 });
+
+// Custom validation to ensure dormitory members are present when dormitory is selected
+propertySchema.pre('validate', function(next) {
+    if (this.roomTypes && this.roomTypes.dormitory) {
+        if (!this.dormitoryMembers || this.dormitoryMembers.length === 0) {
+            const error = new Error('At least one dormitory member is required when dormitory room type is selected');
+            error.name = 'ValidationError';
+            return next(error);
+        }
+        
+        // Check if any dormitory member has empty required fields
+        for (const member of this.dormitoryMembers) {
+            if (!member.fullName || !member.year || !member.state || !member.branch) {
+                const error = new Error('All dormitory member fields (fullName, year, state, branch) are required');
+                error.name = 'ValidationError';
+                return next(error);
+            }
+        }
+    }
+    next();
+});
 
 module.exports = mongoose.model('Property', propertySchema);

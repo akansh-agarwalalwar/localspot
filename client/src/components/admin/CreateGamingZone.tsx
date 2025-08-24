@@ -239,7 +239,7 @@ const CreateGamingZone: React.FC<CreateGamingZoneProps> = ({ onSubmit, loading =
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="hourlyPrice" className="block text-sm font-medium text-gray-700 mb-1">
-                  Hourly Price (₹) *
+                  💰 Hourly Price (₹) *
                 </label>
                 <input
                   type="number"
@@ -264,7 +264,7 @@ const CreateGamingZone: React.FC<CreateGamingZoneProps> = ({ onSubmit, loading =
 
               <div>
                 <label htmlFor="monthlyPrice" className="block text-sm font-medium text-gray-700 mb-1">
-                  Monthly Price (₹) *
+                  💰 Monthly Price (₹) *
                 </label>
                 <input
                   type="number"
@@ -342,7 +342,7 @@ const CreateGamingZone: React.FC<CreateGamingZoneProps> = ({ onSubmit, loading =
 
             <div className="bg-purple-50 border border-purple-200 rounded-md p-3">
               <p className="text-sm text-purple-800">
-                📌 <strong>Cover Photo Guidelines:</strong>
+                � <strong>Cover Photo Guidelines:</strong>
               </p>
               <ul className="text-sm text-purple-700 mt-2 ml-4 list-disc">
                 <li>This will be the main image shown on listings</li>

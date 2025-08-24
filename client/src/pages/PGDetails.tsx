@@ -306,7 +306,6 @@ const PGDetails = () => {
                     </Badge>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground mb-3">
-                    <MapPin className="h-4 w-4" />
                     <span>{property?.location}</span>
                   </div>
                   <div className="flex items-center gap-4">
@@ -604,7 +603,6 @@ const PGDetails = () => {
                       {property?.title}
                     </h2>
                     <div className="flex items-center justify-center gap-2 text-primary-foreground/90">
-                      <MapPin className="h-4 w-4" />
                       <span className="text-sm">{property?.location}</span>
                     </div>
                   </div>

@@ -134,7 +134,7 @@ const GamingZoneList: React.FC<GamingZoneListProps> = ({
                       <img
                         src={gamingZone.coverPhoto}
                         alt={gamingZone.title}
-                        className="w-full h-full object-cover"
+                        className="w-[1050px] h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-200">

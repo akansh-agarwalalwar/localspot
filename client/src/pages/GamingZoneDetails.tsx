@@ -356,7 +356,6 @@ Please confirm availability and booking details.`;
                     </Badge>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground mb-3">
-                    <MapPin className="h-4 w-4" />
                     <span>{gamingZone?.location}</span>
                   </div>
                   <div className="flex items-center gap-4">
@@ -552,7 +551,6 @@ Please confirm availability and booking details.`;
                       {gamingZone?.title}
                     </h2>
                     <div className="flex items-center justify-center gap-2 text-purple-100">
-                      <MapPin className="h-4 w-4" />
                       <span className="text-sm">{gamingZone?.location}</span>
                     </div>
                   </div>

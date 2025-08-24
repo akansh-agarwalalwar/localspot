@@ -181,8 +181,8 @@ const PropertyList: React.FC<PropertyListProps> = ({
                     <p className="text-sm text-gray-600 mb-3 line-clamp-2">{property.description}</p>
                     
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-lg font-bold text-indigo-600">₹{property.price}</span>
-                      <span className="text-sm text-gray-500">{property.location}</span>
+                      <span className="text-lg font-bold text-indigo-600">💰 ₹{property.price}</span>
+                      <span className="text-sm text-gray-500">📍 {property.location}</span>
                     </div>
 
                     {/* Amenities and Room Types */}
@@ -192,6 +192,27 @@ const PropertyList: React.FC<PropertyListProps> = ({
                         compact={true} 
                         className="text-xs"
                       />
+                      
+                      {/* Dormitory Members Details */}
+                      {property.roomTypes?.dormitory && property.dormitoryMembers && property.dormitoryMembers.length > 0 && (
+                        <div className="mt-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                          <h4 className="text-sm font-medium text-purple-800 mb-2 flex items-center gap-1">
+                            <span>🏠</span> Dormitory Residents ({property.dormitoryMembers.length})
+                          </h4>
+                          <div className="space-y-1">
+                            {property.dormitoryMembers.slice(0, 2).map((member, index) => (
+                              <div key={index} className="text-xs text-purple-700 bg-white rounded px-2 py-1">
+                                <strong>{member.fullName}</strong> • {member.year} • {member.branch} • {member.state}
+                              </div>
+                            ))}
+                            {property.dormitoryMembers.length > 2 && (
+                              <div className="text-xs text-purple-600 font-medium">
+                                +{property.dormitoryMembers.length - 2} more residents
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex justify-between items-center">
