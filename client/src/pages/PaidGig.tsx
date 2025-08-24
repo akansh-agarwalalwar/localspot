@@ -349,7 +349,7 @@ const PaidGig = () => {
                       <div className="flex flex-wrap gap-3">
                         {skillOptions.map((skill) => (
                           <Badge key={skill.id} variant="secondary" className="p-2 bg-white border border-blue-200">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center text-black gap-2">
                               {skill.icon}
                               {skill.label}
                             </div>

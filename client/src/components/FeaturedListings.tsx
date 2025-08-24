@@ -221,7 +221,7 @@ const FeaturedListings = () => {
   };
 
   return (
-    <section className="py-20 bg-background">
+    <section className="py-12 sm:py-16 lg:py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <motion.div
@@ -229,15 +229,15 @@ const FeaturedListings = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-10 lg:mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 lg:mb-4">
             Featured{" "}
             <span className="bg-gradient-hero bg-clip-text text-transparent">
               Listings
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+          <p className="text-sm sm:text-base lg:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 lg:mb-8 px-4">
             Handpicked accommodations and services with the best ratings and reviews
           </p>
 
@@ -248,7 +248,8 @@ const FeaturedListings = () => {
                 key={category.id}
                 variant={activeCategory === category.id ? "default" : "outline"}
                 onClick={() => setActiveCategory(category.id)}
-                className={`transition-all duration-300 ${
+                size="sm"
+                className={`transition-all duration-300 text-xs sm:text-sm ${
                   activeCategory === category.id 
                     ? "bg-gradient-primary text-white" 
                     : "hover:bg-primary hover:text-primary-foreground"
@@ -266,26 +267,26 @@ const FeaturedListings = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
         >
           {loading ? (
             // Loading skeleton
             [...Array(6)].map((_, index) => (
-              <div key={index} className="bg-card rounded-2xl p-6 animate-pulse">
+              <div key={index} className="bg-card rounded-xl lg:rounded-2xl p-4 lg:p-6 animate-pulse">
                 <div className="aspect-[4/3] bg-gray-200 rounded-xl mb-4"></div>
                 <div className="space-y-3">
-                  <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+                  <div className="h-5 lg:h-6 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 lg:h-4 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-3 lg:h-4 bg-gray-200 rounded w-full"></div>
+                  <div className="h-6 lg:h-8 bg-gray-200 rounded w-1/3"></div>
                 </div>
               </div>
             ))
           ) : listings.length === 0 ? (
-            <div className="col-span-full text-center py-12">
-              <div className="max-w-md mx-auto">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No listings found</h3>
-                <p className="text-gray-500">Check back later for new listings.</p>
+            <div className="col-span-full text-center py-8 lg:py-12">
+              <div className="max-w-md mx-auto px-4">
+                <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-2">No listings found</h3>
+                <p className="text-sm lg:text-base text-gray-500">Check back later for new listings.</p>
               </div>
             </div>
           ) : (
@@ -298,7 +299,7 @@ const FeaturedListings = () => {
                   key={listing._id}
                   variants={itemVariants}
                   whileHover={{ y: -8 }}
-                  className="bg-card rounded-2xl overflow-hidden shadow-medium hover:shadow-large transition-all duration-300 group"
+                  className="bg-card rounded-xl lg:rounded-2xl overflow-hidden shadow-medium hover:shadow-large transition-all duration-300 group"
                 >
                   {/* Image Container */}
                   <div className="relative overflow-hidden">
@@ -319,11 +320,11 @@ const FeaturedListings = () => {
                           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20">
                             <div className="absolute inset-0 flex items-center justify-center">
                               {listing.type === 'gaming' ? (
-                                <Gamepad2 className="h-12 w-12 text-muted-foreground" />
+                                <Gamepad2 className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-muted-foreground" />
                               ) : listing.type === 'mess' ? (
-                                <Utensils className="h-12 w-12 text-muted-foreground" />
+                                <Utensils className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-muted-foreground" />
                               ) : (
-                                <Camera className="h-12 w-12 text-muted-foreground" />
+                                <Camera className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-muted-foreground" />
                               )}
                             </div>
                           </div>
@@ -333,7 +334,7 @@ const FeaturedListings = () => {
                     
                     {/* Badge */}
                     <Badge 
-                      className="absolute top-4 left-4 bg-primary text-primary-foreground font-semibold"
+                      className="absolute top-2 sm:top-3 lg:top-4 left-2 sm:left-3 lg:left-4 bg-primary text-primary-foreground font-semibold text-xs lg:text-sm"
                     >
                       Featured
                     </Badge>
@@ -345,7 +346,7 @@ const FeaturedListings = () => {
                                         (listing.pics?.length || 0) +
                                         (listing.images?.length || 0);
                       return totalPhotos > 1 && (
-                        <div className="absolute bottom-4 right-4 bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                        <div className="absolute bottom-2 sm:bottom-3 lg:bottom-4 right-2 sm:right-3 lg:right-4 bg-black/50 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
                           <Camera className="h-3 w-3" />
                           <span>{totalPhotos} photos</span>
                         </div>
@@ -354,30 +355,30 @@ const FeaturedListings = () => {
                   </div>
 
                   {/* Content */}
-                  <div className="p-6">
+                  <div className="p-4 sm:p-5 lg:p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <h3 className="text-xl font-bold mb-1 group-hover:text-primary transition-colors">
+                        <h3 className="text-lg sm:text-xl font-bold mb-1 group-hover:text-primary transition-colors line-clamp-2">
                           {listing.title}
                         </h3>
                         <div className="flex items-center gap-1 text-muted-foreground text-sm">
-                          <MapPin className="h-4 w-4" />
-                          <span>{listing.location}</span>
+                          <MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                          <span className="truncate">{listing.location}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Features - Real amenities with cool colors and icons */}
                     <div className="flex flex-wrap gap-1 mb-4">
-                      {features.map((feature) => (
+                      {features.slice(0, 3).map((feature) => (
                         <span
                           key={feature.key}
                           className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${feature.badgeColor}`}
                           title={feature.label}
                         >
                           <span className="mr-1">{feature.icon}</span>
-                          {feature.label}
+                          <span className="hidden sm:inline">{feature.label}</span>
                         </span>
                       ))}
                       {/* Show "+X more" if there are more amenities */}
@@ -385,7 +386,7 @@ const FeaturedListings = () => {
                         const totalAmenities = getListingAmenities(listing.originalData, listing.type).length;
                         const roomTypes = listing.type === 'pg' ? getListingRoomTypes(listing.originalData as Property).length : 0;
                         const totalFeatures = totalAmenities + roomTypes;
-                        const showing = features.length;
+                        const showing = 3;
                         
                         return totalFeatures > showing && (
                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
@@ -397,13 +398,13 @@ const FeaturedListings = () => {
 
                     {/* Price & CTA */}
                     <div className="flex items-center justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xl font-bold text-primary">
+                      <div className="flex-1 mr-3">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <span className="text-xl sm:text-2xl font-bold text-primary">
                             ₹{pricingInfo.price.toLocaleString()}
                           </span>
                         </div>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-xs sm:text-sm text-muted-foreground">
                           {pricingInfo.period}
                         </span>
                         {pricingInfo.subtitle && (
@@ -413,10 +414,12 @@ const FeaturedListings = () => {
                         )}
                       </div>
                       <Button 
-                        className="hover-glow"
+                        size="sm"
+                        className="hover-glow text-xs sm:text-sm px-3 sm:px-4 h-8 sm:h-9"
                         onClick={() => navigate(getNavigationPath(listing))}
                       >
-                        View Details
+                        <span className="hidden sm:inline">View Details</span>
+                        <span className="sm:hidden">View</span>
                       </Button>
                     </div>
                   </div>

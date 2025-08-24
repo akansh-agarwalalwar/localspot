@@ -89,7 +89,7 @@ const TestimonialsSection = () => {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-br from-primary-light via-background to-secondary-light">
+    <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-primary-light via-background to-secondary-light">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <motion.div
@@ -97,15 +97,15 @@ const TestimonialsSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-8 sm:mb-12 lg:mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 lg:mb-4">
             What Our{" "}
             <span className="bg-gradient-hero bg-clip-text text-transparent">
               Customers Say
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Real experiences from real customers who found their perfect match through StudentsHub
           </p>
         </motion.div>
@@ -116,7 +116,7 @@ const TestimonialsSection = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
         >
           {testimonials.map((testimonial, index) => (
             <motion.div
@@ -126,53 +126,53 @@ const TestimonialsSection = () => {
                 y: -8,
                 transition: { duration: 0.3 }
               }}
-              className="bg-card rounded-2xl p-8 shadow-medium hover:shadow-large transition-all duration-300 relative group"
+              className="bg-card rounded-xl lg:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-medium hover:shadow-large transition-all duration-300 relative group"
             >
               {/* Quote Icon */}
-              <div className="absolute top-6 right-6 opacity-20 group-hover:opacity-30 transition-opacity">
-                <Quote className="h-8 w-8 text-primary" />
+              <div className="absolute top-4 sm:top-5 lg:top-6 right-4 sm:right-5 lg:right-6 opacity-20 group-hover:opacity-30 transition-opacity">
+                <Quote className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-primary" />
               </div>
 
               {/* Category Badge */}
-              <div className="inline-block bg-primary-light text-primary text-xs px-3 py-1 rounded-full font-semibold mb-4">
+              <div className="inline-block bg-primary-light text-primary text-xs px-2 sm:px-3 py-1 rounded-full font-semibold mb-3 lg:mb-4">
                 {testimonial.category}
               </div>
 
               {/* Rating */}
-              <div className="flex items-center gap-1 mb-4">
+              <div className="flex items-center gap-1 mb-3 lg:mb-4">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
-                    className={`h-4 w-4 ${
+                    className={`h-3 w-3 sm:h-4 sm:w-4 ${
                       i < testimonial.rating
                         ? "fill-yellow-400 text-yellow-400"
                         : "text-muted-foreground"
                     }`}
                   />
                 ))}
-                <span className="ml-2 text-sm text-muted-foreground">
+                <span className="ml-1 sm:ml-2 text-xs sm:text-sm text-muted-foreground">
                   {testimonial.rating}.0
                 </span>
               </div>
 
               {/* Testimonial Text */}
-              <p className="text-muted-foreground mb-6 leading-relaxed">
+              <p className="text-muted-foreground mb-4 sm:mb-5 lg:mb-6 leading-relaxed text-sm sm:text-base">
                 "{testimonial.text}"
               </p>
 
               {/* Customer Info */}
-              <div className="flex items-center gap-4">
-                <Avatar className="w-12 h-12">
+              <div className="flex items-center gap-3 lg:gap-4">
+                <Avatar className="w-10 h-10 sm:w-12 sm:h-12">
                   <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
-                  <AvatarFallback className="bg-gradient-primary text-white">
+                  <AvatarFallback className="bg-gradient-primary text-white text-sm">
                     {testimonial.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h4 className="font-semibold text-foreground">
+                  <h4 className="font-semibold text-foreground text-sm sm:text-base">
                     {testimonial.name}
                   </h4>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     {testimonial.role}, {testimonial.location}
                   </p>
                 </div>
