@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Star, MapPin, Clock, IndianRupee, Utensils, Filter, Eye, Heart, Share2, Calendar, Loader, Coffee, Soup, UtensilsCrossed, Cookie } from "lucide-react";
+import { Star, MapPin, Clock, IndianRupee, Utensils, Filter, Eye, Heart, Share2, Calendar, Loader, Coffee, Soup, UtensilsCrossed, Cookie, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -309,16 +309,26 @@ Please provide more details about pricing and availability.`;
             
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto bg-white/95 backdrop-blur-lg rounded-2xl p-6">
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="relative">
                 <Input 
                   placeholder="Search location..." 
-                  className="bg-white text-black placeholder:text-gray-500" 
+                  className="bg-white text-black placeholder:text-gray-500 pr-12 h-12 text-base rounded-xl border-2 border-gray-200 focus:border-blue-500 transition-colors" 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      // Trigger search action - the search is already handled by useEffect
+                    }
+                  }}
                 />
-                <Button className="bg-gradient-primary hover:opacity-90">
-                  Search
-                </Button>
+                <button
+                  onClick={() => {
+                    // Trigger search action - the search is already handled by useEffect
+                  }}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white p-2 rounded-lg transition-all duration-200 hover:scale-105"
+                >
+                  <Search className="h-5 w-5" />
+                </button>
               </div>
             </div>
           </motion.div>

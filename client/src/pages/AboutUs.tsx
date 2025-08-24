@@ -100,7 +100,7 @@ const AboutUs = () => {
     {
       year: "2025",
       title: "Platform Launch", 
-      description: "Officially launched PgNearU with curated listings for PGs, mess services, and gaming zones"
+      description: "Officially launched StudentsHub with curated listings for PGs, mess services, and gaming zones"
     },
     {
       year: "2025",
@@ -123,7 +123,7 @@ const AboutUs = () => {
             className="text-center max-w-4xl mx-auto"
           >
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-shadow-lg">
-              About PgNearU
+              About StudentsHub
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed">
               We're on a mission to make finding quality local accommodations and services as easy as clicking a button. 
@@ -241,7 +241,7 @@ const AboutUs = () => {
         >
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">
-              How PgNearU <span className="bg-gradient-hero bg-clip-text text-transparent">Works</span>
+              How StudentsHub <span className="bg-gradient-hero bg-clip-text text-transparent">Works</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Our platform simplifies the entire process from search to booking
@@ -459,7 +459,7 @@ const AboutUs = () => {
                 Ready to Find Your Perfect Space?
               </h2>
               <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                Join thousands of satisfied customers who found their ideal accommodation through PgNearU
+                Join thousands of satisfied customers who found their ideal accommodation through StudentsHub
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Button 

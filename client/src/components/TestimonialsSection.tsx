@@ -10,7 +10,7 @@ const TestimonialsSection = () => {
       role: "Software Engineer",
       location: "Delhi",
       rating: 5,
-      text: "Found the perfect PG through PgNearU! The booking process was seamless and the amenities were exactly as described. Highly recommended for anyone looking for quality accommodation.",
+      text: "Found the perfect PG through StudentsHub! The booking process was seamless and the amenities were exactly as described. Highly recommended for anyone looking for quality accommodation.",
       avatar: "/api/placeholder/60/60",
       category: "PG Booking",
     },
@@ -40,7 +40,7 @@ const TestimonialsSection = () => {
       role: "Freelancer",
       location: "Chennai",
       rating: 5,
-      text: "PgNearU is a game-changer! Found a cozy cafe with great WiFi for my work sessions. The platform's search filters helped me find exactly what I needed.",
+      text: "StudentsHub is a game-changer! Found a cozy cafe with great WiFi for my work sessions. The platform's search filters helped me find exactly what I needed.",
       avatar: "/api/placeholder/60/60",
       category: "Cafe Booking",
     },
@@ -60,7 +60,7 @@ const TestimonialsSection = () => {
       role: "Startup Founder",
       location: "Delhi",
       rating: 5,
-      text: "As a startup founder, I appreciate efficiency. PgNearU delivered exactly that - quick, reliable bookings with verified listings. Will definitely use again!",
+      text: "As a startup founder, I appreciate efficiency. StudentsHub delivered exactly that - quick, reliable bookings with verified listings. Will definitely use again!",
       avatar: "/api/placeholder/60/60",
       category: "Co-working Space",
     },
@@ -106,7 +106,7 @@ const TestimonialsSection = () => {
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Real experiences from real customers who found their perfect match through PgNearU
+            Real experiences from real customers who found their perfect match through StudentsHub
           </p>
         </motion.div>
 

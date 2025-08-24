@@ -24,7 +24,7 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email Support", 
-      details: ["support@pgnearu.com", "help@pgnearu.com"],
+      details: ["support@studentshub.com", "help@studentshub.com"],
       description: "Send us your queries anytime",
       available: "Response within 2 hours"
     },

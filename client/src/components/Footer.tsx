@@ -116,8 +116,8 @@ const Footer = () => {
     {
       icon: Mail,
       label: "Email",
-      value: "support@pgnearu.com",
-      href: "mailto:support@pgnearu.com",
+      value: "support@studentshub.com",
+      href: "mailto:support@studentshub.com",
     },
   ];
 
@@ -140,7 +140,7 @@ const Footer = () => {
                 <span className="text-white font-bold">LS</span>
               </div>
               <span className="text-2xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-                PgNearU
+                StudentsHub
               </span>
             </div>
 
@@ -231,7 +231,7 @@ const Footer = () => {
               <h3 className="text-2xl font-bold mb-3">
                 Stay Updated with{" "}
                 <span className="bg-gradient-hero bg-clip-text text-transparent">
-                  <span className="font-bold text-lg">PgNearU</span>
+                  <span className="font-bold text-lg">StudentsHub</span>
                 </span>
               </h3>
               <p className="text-muted-foreground">
@@ -270,7 +270,7 @@ const Footer = () => {
             {/* Copyright */}
             <div className="text-center md:text-left">
               <p className="text-muted-foreground text-sm">
-                © 2025 PgNearU. All rights reserved. Made with ❤️ in India
+                © 2025 StudentsHub. All rights reserved. Made with ❤️ in India
               </p>
             </div>
 

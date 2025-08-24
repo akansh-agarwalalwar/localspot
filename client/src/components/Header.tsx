@@ -38,7 +38,7 @@ const Header = () => {
       >
         <div className="container mx-auto flex items-center justify-between text-sm">
           <div className="flex items-center gap-4">
-            <span className="font-bold text-lg bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">PgNearU</span>
+            <span className="font-bold text-lg bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">StudentsHub</span>
             <span className="hidden md:inline text-primary-foreground/90">Find best room online at a single place</span>
           </div>
           <div className="flex items-center gap-4">
@@ -82,7 +82,7 @@ const Header = () => {
             >
               <img 
                 src="/logo.png" 
-                alt="PgNearU Logo" 
+                alt="StudentsHub Logo" 
                 className="h-12 w-auto object-contain"
               />
             </motion.div>
