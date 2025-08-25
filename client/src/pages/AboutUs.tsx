@@ -69,21 +69,21 @@ const AboutUs = () => {
     {
       name: "Vansh Agarwal",
       role: "Founder & CEO",
-      description: "Visionary entrepreneur driving innovation in student accommodation. Passionate about creating seamless experiences that connect students with their perfect living spaces.",
+      description: "A visionary entrepreneur, Vansh leads the company with a passion for building innovative solutions for students. With strong leadership and strategic skills, he drives the overall growth and direction of the platform.",
       image: "/vansh.jpeg"
-    },
-    {
-      name: "Swayam Gupta", 
-      role: "Co-founder & Marketing Head",
-      description: "Operations mastermind ensuring excellence at every touchpoint. Specializes in scaling platforms while maintaining the highest quality standards.",
-      image: "/swayam.jpeg"
     },
     {
       name: "Sonu Prajapati",
       role: "Co-founder & Product Manager", 
-      description: "Tech architect building the future of property discovery. Creates robust, intuitive platforms that make finding accommodation effortless and secure.",
+      description: "Sonu specializes in product development and user experience, ensuring the platform delivers seamless accommodation, food, and entertainment services. His analytical mindset and problem-solving skills make him the backbone of product innovation.",
       image: "/sonu.jpeg"
-    }
+    },
+    {
+      name: "Swayam Gupta", 
+      role: "Co-founder & Marketing Head",
+      description: "Swayam is the creative force behind the brand’s presence, building impactful marketing strategies to connect with students. With expertise in digital campaigns and brand storytelling, he ensures maximum outreach and engagement.",
+      image: "/swayam.jpeg"
+    },
   ];
 
   const journey = [

@@ -40,6 +40,7 @@ import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { GigWorkerFormData } from "@/types";
 import { gigWorkerAPI } from "@/services/api";
+import { sendFreelancerRegistrationEmail, sendClientProjectEmail } from "@/services/emailService";
 
 const PaidGig = () => {
   const [activeTab, setActiveTab] = useState("freelancer");
@@ -75,11 +76,11 @@ const PaidGig = () => {
 
   const skillOptions = [
     { id: 'assignments', label: 'Assignment Writing', icon: <PenTool className="h-4 w-4" /> },
-    { id: 'excel', label: 'Excel/Data Files', icon: <Calculator className="h-4 w-4" /> },
-    { id: 'documents', label: 'Document Creation', icon: <FileText className="h-4 w-4" /> },
+    { id: 'excel', label: '4th Year Projects', icon: <Calculator className="h-4 w-4" /> },
+    { id: 'documents', label: 'Files Writing', icon: <FileText className="h-4 w-4" /> },
     { id: 'coding', label: 'Programming/Projects', icon: <Code className="h-4 w-4" /> },
     { id: 'design', label: 'Graphic Design', icon: <Edit3 className="h-4 w-4" /> },
-    { id: 'research', label: 'Research & Analysis', icon: <Search className="h-4 w-4" /> },
+    { id: 'research', label: 'EG Files', icon: <FileText className="h-4 w-4" /> },
   ];
 
   const projectTypes = [
@@ -134,36 +135,39 @@ const PaidGig = () => {
     setIsSubmittingFreelancer(true);
 
     try {
-      const response = await gigWorkerAPI.registerGigWorker(freelancerData);
+      // Send email notification
+      await sendFreelancerRegistrationEmail(freelancerData);
       
-      if (response.data.success) {
-        toast.success("Registration successful! We'll contact you within 24 hours.");
+      // Also try to register with the backend API
+      try {
+        const response = await gigWorkerAPI.registerGigWorker(freelancerData);
         
-        // Reset form
-        setFreelancerData({
-          fullName: '',
-          email: '',
-          mobile: '',
-          year: '',
-          branch: '',
-          skills: [],
-          experience: '',
-          hourlyRate: '',
-        });
-      } else {
-        toast.error(response.data.message || "Registration failed");
+        if (response.data.success) {
+          toast.success("Registration successful! We'll contact you within 24 hours.");
+        } else {
+          toast.success("Registration submitted! We'll contact you within 24 hours.");
+        }
+      } catch (apiError) {
+        // Even if API fails, email was sent successfully
+        toast.success("Registration submitted! We'll contact you within 24 hours.");
+        console.log('API registration failed, but email was sent:', apiError);
       }
+      
+      // Reset form
+      setFreelancerData({
+        fullName: '',
+        email: '',
+        mobile: '',
+        year: '',
+        branch: '',
+        skills: [],
+        experience: '',
+        hourlyRate: '',
+      });
+      
     } catch (error: any) {
       console.error('Freelancer registration error:', error);
-      
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else if (error.response?.data?.errors) {
-        const errorMessages = error.response.data.errors.map((err: any) => err.msg).join(', ');
-        toast.error(errorMessages);
-      } else {
-        toast.error("Something went wrong. Please try again.");
-      }
+      toast.error("Something went wrong. Please try again or contact us directly.");
     } finally {
       setIsSubmittingFreelancer(false);
     }
@@ -185,8 +189,10 @@ const PaidGig = () => {
     setIsSubmittingClient(true);
 
     try {
-      // For now, we'll show a success message. You might want to create a separate API endpoint for client requests
-      toast.success("Project request submitted! We'll match you with suitable freelancers soon.");
+      // Send email notification
+      await sendClientProjectEmail(clientData);
+      
+      toast.success("Project request submitted! We'll match you with suitable freelancers within 24 hours.");
       
       // Reset form
       setClientData({
@@ -201,9 +207,10 @@ const PaidGig = () => {
         skillsNeeded: [],
         urgency: ''
       });
+      
     } catch (error: any) {
       console.error('Client request error:', error);
-      toast.error("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again or contact us directly.");
     } finally {
       setIsSubmittingClient(false);
     }
@@ -232,28 +239,8 @@ const PaidGig = () => {
               <Sparkles className="h-10 w-10 text-indigo-500 animate-pulse" />
             </div>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-8">
-              Connect talented freelancers with clients who need quality work done. Whether you're looking to earn or need help with your projects, we've got you covered.
+              Connect talented freelancers with clients who need quality work done. Whether you're looking to earn or need help with your projects, we've got you covered. From writing Assignments to making 4<sup>th</sup> Year Projects.
             </p>
-            
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">500+</div>
-                <div className="text-sm text-gray-500">Active Freelancers</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-indigo-600">1000+</div>
-                <div className="text-sm text-gray-500">Projects Completed</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">₹10L+</div>
-                <div className="text-sm text-gray-500">Total Earnings</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">4.9★</div>
-                <div className="text-sm text-gray-500">Average Rating</div>
-              </div>
-            </div>
           </motion.div>
 
           {/* Two-Section Layout */}

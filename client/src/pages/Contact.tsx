@@ -17,7 +17,7 @@ const Contact = () => {
     {
       icon: Phone,
       title: "Phone Support",
-      details: ["+91 8852019731"],
+      details: ["+91 8852019731", "+91 8700657623", "+91 8447086603"],
       description: "Call us for immediate assistance",
       available: "24/7"
     },
@@ -31,7 +31,7 @@ const Contact = () => {
     {
       icon: MessageCircle,
       title: "WhatsApp Support",
-      details: ["+91 8852019731"],
+      details: ["+91 8852019731", "+91 8700657623", "+91 8447086603"],
       description: "Quick support via WhatsApp",
       available: "24/7"
     }
